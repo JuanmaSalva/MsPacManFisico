@@ -73,12 +73,8 @@ void seguimientoLinea(){
   int izquierda = digitalRead(SENSOR_I);
   int centro = digitalRead(SENSOR_C);
   int derecha = digitalRead(SENSOR_D);
-  //Serial.print(izquierda);
-  //Serial.print(centro);
-  //Serial.println(derecha);
 
 
-  //recto
   if(izquierda == 1 && centro == 0 && derecha == 1){  
     Serial.println("Recta");
     digitalWrite(IN1I, LOW);
@@ -86,27 +82,25 @@ void seguimientoLinea(){
     digitalWrite(IN1D, HIGH);
     digitalWrite(IN2D, LOW);  
   }
-  //nos hemos desviado hacia la derecha
-  else if (izquierda == 0 && centro == 1) {     
+  else if (izquierda == 0 && derecha == 1) {     
     Serial.println("Desvio derecha");  
     digitalWrite(IN1I, LOW);
     digitalWrite(IN2I, HIGH);   
     digitalWrite(IN1D, LOW);
     digitalWrite(IN2D, LOW); 
-    delay(30); 
+    delay(45); 
     recta(75);
   }
-  //nos hemos desviado hacia la izquierda
-  else if(centro == 1 && derecha == 0){
+  else if(izquierda == 1 && derecha == 0){
     Serial.println("Desvio izquierda");  
     digitalWrite(IN1I, LOW);
     digitalWrite(IN2I, LOW);   
     digitalWrite(IN1D, HIGH);
     digitalWrite(IN2D, LOW);    
-    delay(30); 
+    delay(45); 
     recta(75);  
   }
-  //nos paramos
+  
   else{
     Serial.println("Parada");  
     digitalWrite(IN1I, LOW);
@@ -119,26 +113,5 @@ void seguimientoLinea(){
 
 
 void loop() {
-  int izquierda = digitalRead(SENSOR_I);
-  int centro = digitalRead(SENSOR_C);
-  int derecha = digitalRead(SENSOR_D);
-  //Serial.print(izquierda);
-  //Serial.print(centro);
-  //Serial.println(derecha);
-
-
-  //recto
-  if(izquierda == 1 && centro == 0 && derecha == 1){  
-    Serial.println("Recta");
-    digitalWrite(IN1I, LOW);
-    digitalWrite(IN2I, HIGH);   
-    digitalWrite(IN1D, HIGH);
-    digitalWrite(IN2D, LOW);  
-  }
-  else{
-    digitalWrite(IN1I, LOW);
-    digitalWrite(IN2I, LOW);   
-    digitalWrite(IN1D, LOW);
-    digitalWrite(IN2D, LOW);      
-  }
+  seguimientoLinea();
 }
