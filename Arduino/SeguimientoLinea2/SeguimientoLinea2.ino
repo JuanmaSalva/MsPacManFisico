@@ -1,9 +1,10 @@
 #define LINEA 1
 #define PASILLO 0
 
-#define VELOCIDAD_NORMAL 175
-#define VELOCIDAD_REDUCIDA 80
+#define VELOCIDAD_NORMAL 185
+#define VELOCIDAD_REDUCIDA 70
 
+#define TIEMPO_ROTACION 400
 
 int velocidadDerecha = 11; //derecha
 int delanteDerecha = A1;
@@ -67,7 +68,7 @@ void noventagrados(bool derecha){
     digitalWrite(delanteDerecha, HIGH);
     digitalWrite(atrasDerecha, LOW);
   }
-  delay(545);
+  delay(TIEMPO_ROTACION);
 }
 
 void cientoochentagrados(){
@@ -102,7 +103,7 @@ void seguimientoLinea(){
     delay(100);
     noventagrados(false);
     parada();
-    delay(500);
+    delay(100);
     recta(true);
     delay(300);
   }
