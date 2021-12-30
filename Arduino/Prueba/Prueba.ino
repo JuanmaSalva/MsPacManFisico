@@ -1,4 +1,4 @@
-int ENA = A0;
+int ENA = 11;
 int IN1D = A1;
 int IN2D = A2;
 int IN1I = A3;

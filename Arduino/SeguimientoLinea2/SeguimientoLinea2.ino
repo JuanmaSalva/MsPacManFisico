@@ -1,16 +1,16 @@
 #define LINEA 1
 #define PASILLO 0
 
-#define TIEMPO_DE_GIRO 35
-#define TIEMPO_RECTO 70
+#define VELOCIDAD_NORMAL 175
+#define VELOCIDAD_REDUCIDA 80
 
 
-int ENA = A0;
-int IN1D = A1;
-int IN2D = A2;
-int IN1I = A3;
-int IN2I = A4;
-int ENB = A5;
+int velocidadDerecha = 11; //derecha
+int delanteDerecha = A1;
+int atrasDerecha = A2;
+int delanteIzquierda = A3;
+int atrasIzquierda = A4;
+int velocidadIzquierda = 10; //izquierda
 
 int SENSOR_I = 7;
 int SENSOR_C = 6;
@@ -18,15 +18,15 @@ int SENSOR_D = 5;
 
 
 void setup() {
-  pinMode(ENA, OUTPUT);
-  pinMode(IN1D, OUTPUT);
-  pinMode(IN2D, OUTPUT);
-  pinMode(IN1I, OUTPUT);
-  pinMode(IN2I, OUTPUT);
-  pinMode(ENB, OUTPUT);
+  pinMode(velocidadDerecha, OUTPUT);
+  pinMode(delanteDerecha, OUTPUT);
+  pinMode(atrasDerecha, OUTPUT);
+  pinMode(delanteIzquierda, OUTPUT);
+  pinMode(atrasIzquierda, OUTPUT);
+  pinMode(velocidadIzquierda, OUTPUT);
 
-  digitalWrite(ENA, HIGH);
-  digitalWrite(ENB, HIGH);
+  digitalWrite(velocidadDerecha, 100);
+  digitalWrite(velocidadIzquierda, 100);
 
   pinMode(SENSOR_I, INPUT);
   pinMode(SENSOR_C, INPUT);
@@ -36,44 +36,53 @@ void setup() {
 }
 
 
-void recta(int tiempo){
-  digitalWrite(IN1I, LOW);
-  digitalWrite(IN2I, HIGH);
-  digitalWrite(IN1D, HIGH);
-  digitalWrite(IN2D, LOW);
-  delay(tiempo);
+void recta(bool marchaAlante){
+  if(marchaAlante){
+    digitalWrite(delanteIzquierda, LOW);
+    digitalWrite(atrasIzquierda, HIGH);
+    digitalWrite(delanteDerecha, HIGH);
+    digitalWrite(atrasDerecha, LOW);
+  }
+  else {
+    digitalWrite(delanteIzquierda, HIGH);
+    digitalWrite(atrasIzquierda, LOW);
+    digitalWrite(delanteDerecha, LOW);
+    digitalWrite(atrasDerecha, HIGH);
+  }
 }
 
 void noventagrados(bool derecha){
+  analogWrite(velocidadIzquierda, VELOCIDAD_NORMAL);
+  analogWrite(velocidadDerecha, VELOCIDAD_NORMAL);
+
   if(derecha){
-    digitalWrite(IN1I, HIGH);
-    digitalWrite(IN2I, LOW);
-    digitalWrite(IN1D, HIGH);
-    digitalWrite(IN2D, LOW);
+    digitalWrite(delanteIzquierda, LOW);
+    digitalWrite(atrasIzquierda, HIGH);
+    digitalWrite(delanteDerecha, LOW);
+    digitalWrite(atrasDerecha, HIGH);
   }
   else {
-    digitalWrite(IN1I, LOW);
-    digitalWrite(IN2I, HIGH);
-    digitalWrite(IN1D, LOW);
-    digitalWrite(IN2D, HIGH);
+    digitalWrite(delanteIzquierda, HIGH);
+    digitalWrite(atrasIzquierda, LOW);
+    digitalWrite(delanteDerecha, HIGH);
+    digitalWrite(atrasDerecha, LOW);
   }
-  delay(230);
+  delay(545);
 }
 
 void cientoochentagrados(){
-  digitalWrite(IN1I, LOW);
-  digitalWrite(IN2I, HIGH);
-  digitalWrite(IN1D, LOW);
-  digitalWrite(IN2D, HIGH);
+  digitalWrite(delanteIzquierda, LOW);
+  digitalWrite(atrasIzquierda, HIGH);
+  digitalWrite(delanteDerecha, LOW);
+  digitalWrite(atrasDerecha, HIGH);
   delay(460);
 }
 
-void parada(int tiempo){
-  digitalWrite(IN1D, LOW);
-  digitalWrite(IN2D, LOW);
-  digitalWrite(IN1I, LOW);
-  digitalWrite(IN2I, LOW);
-  delay(tiempo);
+void parada(){
+  digitalWrite(delanteDerecha, LOW);
+  digitalWrite(atrasDerecha, LOW);
+  digitalWrite(delanteIzquierda, LOW);
+  digitalWrite(atrasIzquierda, LOW);
 }
 
 
@@ -83,44 +92,32 @@ void seguimientoLinea(){
   int centro = digitalRead(SENSOR_C);
   int derecha = digitalRead(SENSOR_D);
 
-  if(izquierda == LINEA && centro == PASILLO && derecha == LINEA){
-    //Serial.println("Recta");
-    digitalWrite(IN1I, LOW);
-    digitalWrite(IN2I, HIGH);
-    digitalWrite(IN1D, HIGH);
-    digitalWrite(IN2D, LOW);
+  if(izquierda == LINEA && centro == PASILLO && derecha == LINEA){ //recto
+    recta(true);
+    analogWrite(velocidadIzquierda, VELOCIDAD_NORMAL);
+    analogWrite(velocidadDerecha, VELOCIDAD_NORMAL);
   }
-  // else if(izquierda == PASILLO && centro == PASILLO && derecha == LINEA){
-  //   digitalWrite(IN1I, HIGH);
-  //   digitalWrite(IN2I, LOW);
-  //   digitalWrite(IN1D, LOW);
-  //   digitalWrite(IN2D, HIGH);
-  //   delay(1000);
-  // }
-  else if (izquierda == PASILLO && derecha == LINEA) {
-    //Serial.println("Desvio derecha");
-    digitalWrite(IN1I, LOW);
-    digitalWrite(IN2I, HIGH);
-    digitalWrite(IN1D, LOW);
-    digitalWrite(IN2D, LOW);
-    delay(TIEMPO_DE_GIRO);
-    recta(TIEMPO_RECTO);
+  else if(izquierda == LINEA && centro == LINEA && derecha == LINEA){ //Giro 90 grados
+    recta(false);
+    delay(100);
+    noventagrados(false);
+    parada();
+    delay(500);
+    recta(true);
+    delay(300);
   }
-  else if(izquierda == LINEA && derecha == PASILLO){
-    //Serial.println("Desvio izquierda");
-    digitalWrite(IN1I, LOW);
-    digitalWrite(IN2I, LOW);
-    digitalWrite(IN1D, HIGH);
-    digitalWrite(IN2D, LOW);
-    delay(TIEMPO_DE_GIRO);
-    recta(TIEMPO_RECTO);
+  else if (izquierda == PASILLO && derecha == LINEA) { //desvio derecha
+    recta(true);
+
+    analogWrite(velocidadDerecha, VELOCIDAD_REDUCIDA);
   }
-  else{
-    //Serial.println("Parada");
-    digitalWrite(IN1I, LOW);
-    digitalWrite(IN2I, LOW);
-    digitalWrite(IN1D, LOW);
-    digitalWrite(IN2D, LOW);
+  else if(izquierda == LINEA && derecha == PASILLO){ //desvio izquierda
+    recta(true);
+
+    analogWrite(velocidadIzquierda, VELOCIDAD_REDUCIDA);
+  }
+  else{ //parada
+    parada();
   }
 }
 
