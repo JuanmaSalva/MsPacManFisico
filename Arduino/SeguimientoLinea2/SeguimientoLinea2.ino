@@ -1,10 +1,10 @@
 #define LINEA 1
 #define PASILLO 0
 
-#define VELOCIDAD_NORMAL 185
-#define VELOCIDAD_REDUCIDA 70
+#define VELOCIDAD_NORMAL 200
+#define VELOCIDAD_REDUCIDA 60
 
-#define TIEMPO_ROTACION 400
+#define TIEMPO_ROTACION 350
 
 int velocidadDerecha = 11; //derecha
 int delanteDerecha = A1;
@@ -53,16 +53,19 @@ void recta(bool marchaAlante){
 }
 
 void noventagrados(bool derecha){
-  analogWrite(velocidadIzquierda, VELOCIDAD_NORMAL);
-  analogWrite(velocidadDerecha, VELOCIDAD_NORMAL);
-
   if(derecha){
+    analogWrite(velocidadIzquierda, VELOCIDAD_NORMAL);
+    analogWrite(velocidadDerecha, VELOCIDAD_NORMAL);
+
     digitalWrite(delanteIzquierda, LOW);
     digitalWrite(atrasIzquierda, HIGH);
     digitalWrite(delanteDerecha, LOW);
     digitalWrite(atrasDerecha, HIGH);
   }
   else {
+    analogWrite(velocidadIzquierda, VELOCIDAD_NORMAL);
+    analogWrite(velocidadDerecha, VELOCIDAD_NORMAL);   
+
     digitalWrite(delanteIzquierda, HIGH);
     digitalWrite(atrasIzquierda, LOW);
     digitalWrite(delanteDerecha, HIGH);
@@ -98,15 +101,15 @@ void seguimientoLinea(){
     analogWrite(velocidadIzquierda, VELOCIDAD_NORMAL);
     analogWrite(velocidadDerecha, VELOCIDAD_NORMAL);
   }
-  else if(izquierda == LINEA && centro == LINEA && derecha == LINEA){ //Giro 90 grados
-    recta(false);
-    delay(100);
-    noventagrados(false);
-    parada();
-    delay(100);
-    recta(true);
-    delay(300);
-  }
+  // else if(izquierda == LINEA && centro == LINEA && derecha == LINEA){ //Giro 90 grados
+  //   recta(false);
+  //   delay(100);
+  //   noventagrados(false);
+  //   parada();
+  //   delay(100);
+  //   recta(true);
+  //   delay(300);
+  // }
   else if (izquierda == PASILLO && derecha == LINEA) { //desvio derecha
     recta(true);
 
