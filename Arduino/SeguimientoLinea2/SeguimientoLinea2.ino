@@ -7,10 +7,10 @@
 #define TIEMPO_ROTACION 350
 
 int velocidadDerecha = 11; //derecha
-int delanteDerecha = A1;
-int atrasDerecha = A2;
-int delanteIzquierda = A3;
-int atrasIzquierda = A4;
+int delanteDerecha = A0;
+int atrasDerecha = A1;
+int delanteIzquierda = A2;
+int atrasIzquierda = A3;
 int velocidadIzquierda = 10; //izquierda
 
 int SENSOR_I = 7;
