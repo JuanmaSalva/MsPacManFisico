@@ -1,0 +1,28 @@
+#pragma once
+
+#include <Arduino.h>
+#include "Simple_MPU6050.h"
+
+#define MPU6050_ADDRESS_AD0_LOW     0x68      // direccion I2C con AD0 en LOW o sin conexion
+#define MPU6050_ADDRESS_AD0_HIGH    0x69      // direccion I2C con AD0 en HIGH
+#define MPU6050_DEFAULT_ADDRESS     MPU6050_ADDRESS_AD0_LOW // por defecto AD0 en LOW
+
+#define spamtimer(t) for (static uint32_t SpamTimer; (uint32_t)(millis() - SpamTimer) >= (t); SpamTimer = millis())
+// spamtimer funcion para generar demora al escribir en monitor serie sin usar delay()
+
+#define printfloatx(Name,Variable,Spaces,Precision,EndTxt) print(Name); {char S[(Spaces + Precision + 3)];Serial.print(F(" ")); Serial.print(dtostrf((float)Variable,Spaces,Precision ,S));}Serial.print(EndTxt);
+// printfloatx funcion para mostrar en monitor serie datos para evitar el uso se multiples print()
+
+
+class GyroscopeController{
+private:
+
+    //void ShowValues(int16_t *gyro, int16_t *accel, int32_t *quat, uint32_t *timestamp);
+public:
+
+    GyroscopeController();
+
+    void Init();
+    void Update();
+
+};

@@ -41,7 +41,7 @@ void setup() {
   Fastwire::setup(400, true);
 #endif
   
-  Serial.begin(115200);     // inicializacion de monitor serie a 115200 bps
+  Serial.begin(9600);     // inicializacion de monitor serie a 115200 bps
   while (!Serial);      // espera a enumeracion en caso de modelos con USB nativo
   Serial.println(F("Inicio:"));   // muestra texto estatico
 #ifdef OFFSETS                // si existen OFFSETS
@@ -54,9 +54,6 @@ void setup() {
                    " Colocar los nuevos Offsets en #define OFFSETS\n"
                    " para saltar la calibracion inicial \n"
                    " \t\tPresionar cualquier tecla y ENTER"));
-  while (Serial.available() && Serial.read());    // lectura de monitor serie
-  while (!Serial.available());        // si no hay espera              
-  while (Serial.available() && Serial.read());    // lecyura de monitor serie
   mpu.SetAddress(MPU6050_ADDRESS_AD0_LOW).CalibrateMPU().load_DMP_Image();  // inicializacion de sensor
 #endif
   mpu.on_FIFO(mostrar_valores);   // llamado a funcion mostrar_valores si memoria FIFO tiene valores
