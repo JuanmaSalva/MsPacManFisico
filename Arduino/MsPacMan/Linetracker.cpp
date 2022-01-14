@@ -15,11 +15,11 @@ void LineTracker::Update(){
     int centro = digitalRead(SENSOR_C);
     int derecha = digitalRead(SENSOR_R);
 
-    if(izquierda == LINEA && centro == PASILLO && derecha == LINEA) //recto
+    if(izquierda == LINE && centro == CORRIDOR && derecha == LINE) //recto
         currentAction = stright;
-    else if (izquierda == PASILLO && derecha == LINEA)  //desvio derecha
+    else if (izquierda == CORRIDOR && derecha == LINE)  //desvio derecha
         currentAction = leftCorrection;
-    else if(izquierda == LINEA && derecha == PASILLO) //desvio izquierda
+    else if(izquierda == LINE && derecha == CORRIDOR) //desvio izquierda
         currentAction = rightCorrection;
     else
         currentAction = lost;

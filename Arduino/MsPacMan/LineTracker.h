@@ -2,8 +2,8 @@
 
 #include <Arduino.h>
 
-#define LINEA 1
-#define PASILLO 0
+#define LINE 1
+#define CORRIDOR 0
 
 enum Action {
     stright, 

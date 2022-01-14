@@ -4,7 +4,6 @@
 #define MPU6050_DEFAULT_ADDRESS     MPU6050_ADDRESS_AD0_LOW // por defecto AD0 en LOW
 
 Simple_MPU6050 mpu;
-//ENABLE_MPU_OVERFLOW_PROTECTION();   // activa proteccion
 
 //#define OFFSETS  -5114,     484,    1030,      46,     -14,       6  // Colocar valores personalizados
 
