@@ -1,21 +1,23 @@
 #include "LineTracker.h"
 #include "MotorsController.h"
-//#include "GyroscopeController.h"
+#include "GyroscopeController.h"
 
 LineTracker* lineTracker;
 MotorsController* motorsController;
-//GyroscopeController* gyroscopeController;
+GyroscopeController* gyroscopeController;
 
 void setup() {
   lineTracker = new LineTracker();
   lineTracker->Init();
 
+  gyroscopeController = new GyroscopeController();
+  gyroscopeController->Init();
+
   motorsController = new MotorsController();
   motorsController->Init();
   motorsController->SetLineTracker(lineTracker);
+  motorsController->SetGyroscopeController(gyroscopeController);
 
-  //gyroscopeController = new GyroscopeController();
-  //gyroscopeController->Init();
 
   Serial.begin(9600);
 }
@@ -23,6 +25,6 @@ void setup() {
 
 void loop() {
   lineTracker->Update();
+  gyroscopeController->Update();
   motorsController->Update();
-  //gyroscopeController->Update();
 }

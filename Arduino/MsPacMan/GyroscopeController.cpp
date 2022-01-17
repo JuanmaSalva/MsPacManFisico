@@ -1,23 +1,22 @@
 #include "GyroscopeController.h"
 
 Simple_MPU6050 myMpu;
+float currentYaw;
 
 void ShowValues(int16_t *gyro, int16_t *accel, int32_t *quat, uint32_t *timestamp){
-    uint8_t SpamDelay = 100;      // demora para escribir en monitor serie de 100 mseg
-    Quaternion q;         // variable necesaria para calculos posteriores
-    VectorFloat gravity;        // variable necesaria para calculos posteriores
-    float ypr[3] = { 0, 0, 0 };     // array para almacenar valores de yaw, pitch, roll
-    float xyz[3] = { 0, 0, 0 };     // array para almacenar valores convertidos a grados de yaw, pitch, roll
-    spamtimer(SpamDelay) {      // si han transcurrido al menos 100 mseg entonces proceder
-        myMpu.GetQuaternion(&q, quat);    // funcion para obtener valor para calculo posterior
-        myMpu.GetGravity(&gravity, &q);   // funcion para obtener valor para calculo posterior
-        myMpu.GetYawPitchRoll(ypr, &q, &gravity); // funcion obtiene valores de yaw, ptich, roll
-        myMpu.ConvertToDegrees(ypr, xyz);   // funcion convierte a grados sexagesimales
-        Serial.printfloatx(F("Yaw")  , xyz[0], 9, 4, F(",   "));  // muestra en monitor serie rotacion de eje Z, yaw
-        Serial.printfloatx(F("Pitch"), xyz[1], 9, 4, F(",   "));  // muestra en monitor serie rotacion de eje Y, pitch
-        Serial.printfloatx(F("Roll") , xyz[2], 9, 4, F(",   "));  // muestra en monitor serie rotacion de eje X, roll
-        Serial.println();       // salto de linea
-    }
+    Quaternion q;
+    VectorFloat gravity;
+    float ypr[3] = { 0, 0, 0 };
+    float xyz[3] = { 0, 0, 0 };
+    myMpu.GetQuaternion(&q, quat);
+    myMpu.GetGravity(&gravity, &q);
+    myMpu.GetYawPitchRoll(ypr, &q, &gravity);
+    myMpu.ConvertToDegrees(ypr, xyz);
+    Serial.printfloatx(F("Yaw")  , xyz[0], 9, 4, F(",   "));
+    currentYaw = xyz[0];
+    Serial.printfloatx(F("Pitch"), xyz[1], 9, 4, F(",   "));
+    Serial.printfloatx(F("Roll") , xyz[2], 9, 4, F(",   "));
+    Serial.println();
 }
 
 GyroscopeController::GyroscopeController(){
@@ -52,4 +51,8 @@ void GyroscopeController::Init(){
 
 void GyroscopeController::Update(){
     myMpu.dmp_read_fifo();
+}
+
+float GyroscopeController::GetCurrentYaw(){
+    return currentYaw;
 }

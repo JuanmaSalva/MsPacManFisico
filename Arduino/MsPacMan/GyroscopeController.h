@@ -16,13 +16,11 @@
 
 class GyroscopeController{
 private:
-
-    //void ShowValues(int16_t *gyro, int16_t *accel, int32_t *quat, uint32_t *timestamp);
 public:
 
     GyroscopeController();
 
     void Init();
     void Update();
-
+    float GetCurrentYaw();
 };

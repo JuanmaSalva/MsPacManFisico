@@ -1,10 +1,13 @@
 #pragma once
 #include <Arduino.h>
+
 #include "LineTracker.h"
+#include "GyroscopeController.h"
 
 
-#define NORMAL_SPEED 200
-#define REDUCED_SPEED 60
+#define NORMAL_SPEED 150
+#define REDUCED_SPEED 125
+#define INCREASED_SPEED 175
 
 #define ROTATION_TIME 350
 
@@ -18,11 +21,16 @@ private:
     int leftSpeed = 10;
 
     LineTracker* lineTracker;
+    GyroscopeController* gyroscopeController;
+
+    bool turning = false;
+    float initialTurningYaw;
 
     void Stright(bool forwards);
     void Stop();
     void NinetyGegreeTurn(bool rightTurn);
     void OneEightyGegreeTurn();
+    void Turn();
 
 public:
     MotorsController();
@@ -30,4 +38,5 @@ public:
     void Update();
 
     void SetLineTracker(LineTracker* _lineTracker);
+    void SetGyroscopeController(GyroscopeController* _gyroscopeController);
 };

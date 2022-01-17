@@ -1,4 +1,5 @@
 #include "MotorsController.h"
+#include "GyroscopeController.h"
 
 MotorsController::MotorsController(){
 
@@ -14,33 +15,35 @@ void MotorsController::Init(){
 
     digitalWrite(rightSpeed, NORMAL_SPEED);
     digitalWrite(leftSpeed, NORMAL_SPEED);
+    delay(50); //para empezar con velocidad
 }
 
 
 void MotorsController::Update(){
-    Action currentAction = lineTracker->GetCurrentAction();
+    if(turning){
+        Turn();
+        return;
+    }
 
+    Action currentAction = lineTracker->GetCurrentAction();
+ 
     if(currentAction == stright){ //recto
         Stright(true);
         analogWrite(leftSpeed, NORMAL_SPEED);
         analogWrite(rightSpeed, NORMAL_SPEED);
     }
-    // else if(izquierda == LINEA && centro == LINEA && derecha == LINEA){ //Giro 90 grados
-    //   recta(false);
-    //   delay(100);
-    //   noventagrados(false);
-    //   parada();
-    //   delay(100);
-    //   recta(true);
-    //   delay(300);
-    // }
+    else if(currentAction == leftTurn){ //Giro 90 grados
+        NinetyGegreeTurn(false);
+    }
     else if (currentAction == leftCorrection) { //desvio derecha
         Stright(true);
-        analogWrite(rightSpeed, REDUCED_SPEED);
+        analogWrite(leftSpeed, REDUCED_SPEED);
+        analogWrite(rightSpeed, INCREASED_SPEED);
     }
     else if(currentAction == rightCorrection){ //desvio izquierda
         Stright(true);
-        analogWrite(leftSpeed, REDUCED_SPEED);
+        analogWrite(leftSpeed, INCREASED_SPEED);
+        analogWrite(rightSpeed, REDUCED_SPEED);
     }
     else if (currentAction == lost){ //parada
         Stop();
@@ -49,6 +52,10 @@ void MotorsController::Update(){
 
 void MotorsController::SetLineTracker(LineTracker* _lineTracker){
     lineTracker = _lineTracker;
+}
+
+void MotorsController::SetGyroscopeController(GyroscopeController* _gyroscopeController){
+    gyroscopeController = _gyroscopeController;
 }
 
 void MotorsController::Stright(bool forwards){
@@ -74,6 +81,11 @@ void MotorsController::Stop(){
 }
 
 void MotorsController::NinetyGegreeTurn(bool rightTurn){
+    Stright(false);
+    delay(100);
+    Stop();
+    delay(100);
+
     if(rightTurn){
         analogWrite(leftSpeed, NORMAL_SPEED);
         analogWrite(rightSpeed, NORMAL_SPEED);
@@ -92,7 +104,9 @@ void MotorsController::NinetyGegreeTurn(bool rightTurn){
         digitalWrite(forwardRight, HIGH);
         digitalWrite(backwardRight, LOW);
     }
-    delay(ROTATION_TIME);
+
+    turning = true;
+    initialTurningYaw = gyroscopeController->GetCurrentYaw();
 }
 
 void MotorsController::OneEightyGegreeTurn(){
@@ -101,4 +115,26 @@ void MotorsController::OneEightyGegreeTurn(){
     digitalWrite(forwardRight, LOW);
     digitalWrite(backwardRight, HIGH);
     delay(460);
+}
+
+
+void MotorsController::Turn(){
+    if(abs(initialTurningYaw - gyroscopeController->GetCurrentYaw()) > 75.0f){
+        turning = false;
+
+        //provisional
+        analogWrite(leftSpeed, NORMAL_SPEED);
+        analogWrite(rightSpeed, NORMAL_SPEED);
+
+        digitalWrite(forwardLeft, LOW);
+        digitalWrite(backwardLeft, HIGH);
+        digitalWrite(forwardRight, LOW);
+        digitalWrite(backwardRight, HIGH);
+        delay(100);
+
+        Stop();
+        delay(100);
+        Stright(true);
+        delay(300);
+    }
 }
