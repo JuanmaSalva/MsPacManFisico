@@ -85,6 +85,8 @@ void MotorsController::NinetyGegreeTurn(bool rightTurn){
     delay(100);
     Stop();
     delay(100);
+    turning = true;
+    initialTurningYaw = gyroscopeController->GetAdverageYaw();
 
     if(rightTurn){
         analogWrite(leftSpeed, NORMAL_SPEED);
@@ -105,8 +107,6 @@ void MotorsController::NinetyGegreeTurn(bool rightTurn){
         digitalWrite(backwardRight, LOW);
     }
 
-    turning = true;
-    initialTurningYaw = gyroscopeController->GetCurrentYaw();
 }
 
 void MotorsController::OneEightyGegreeTurn(){
@@ -119,7 +119,7 @@ void MotorsController::OneEightyGegreeTurn(){
 
 
 void MotorsController::Turn(){
-    if(abs(initialTurningYaw - gyroscopeController->GetCurrentYaw()) > 75.0f){
+    if(abs(initialTurningYaw - gyroscopeController->GetCurrentYaw()) > 90.0f){
         turning = false;
 
         //provisional
@@ -136,5 +136,6 @@ void MotorsController::Turn(){
         delay(100);
         Stright(true);
         delay(300);
+        gyroscopeController->ResetYaw();
     }
 }
