@@ -21,7 +21,7 @@ void LineTracker::Update(){
     // Serial.print(" ");
     // Serial.println(right);
     if(_left == LINE && _center == CORRIDOR && _right == LINE) //recto
-        currentAction = stright;
+        currentAction = straight;
     else if (_left == CORRIDOR && _right == LINE)  //desvio derecha
         currentAction = leftCorrection;
     else if(_left == LINE && _right == CORRIDOR) //desvio izquierda

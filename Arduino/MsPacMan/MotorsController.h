@@ -9,7 +9,19 @@
 #define REDUCED_SPEED 125
 #define INCREASED_SPEED 175
 
-#define ROTATION_TIME 350
+#define TURN_EXIT_TIME 500
+
+enum State{
+    followingLine,
+    turning,
+    turnExit
+};
+
+enum TurningDirection{
+    left,
+    right,
+    none
+};
 
 class MotorsController{
 private:
@@ -23,13 +35,20 @@ private:
     LineTracker* lineTracker;
     GyroscopeController* gyroscopeController;
 
-    bool turning = false;
+    State state;
     float initialTurningYaw;
+    TurningDirection turningDirection;
+    unsigned long initialTime;
 
     void Stright(bool forwards);
     void Stop();
-    void NinetyGegreeTurn(bool rightTurn);
-    void OneEightyGegreeTurn();
+
+    void NinetyGegreeTurn();
+
+    void FollowLine();
+    void Turning();
+    void TurnExit();
+    
     void Turn();
 
 public:

@@ -6,7 +6,7 @@
 #define CORRIDOR 0
 
 enum Action {
-    stright, 
+    straight, 
     leftCorrection, 
     rightCorrection, 
     leftTurn,

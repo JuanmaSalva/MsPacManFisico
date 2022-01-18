@@ -2,7 +2,8 @@
 #include "GyroscopeController.h"
 
 MotorsController::MotorsController(){
-
+    state = followingLine;
+    turningDirection = none;
 }
 
 void MotorsController::Init(){
@@ -20,33 +21,19 @@ void MotorsController::Init(){
 
 
 void MotorsController::Update(){
-    if(turning){
-        Turn();
-        return;
-    }
-
-    Action currentAction = lineTracker->GetCurrentAction();
- 
-    if(currentAction == stright){ //recto
-        Stright(true);
-        analogWrite(leftSpeed, NORMAL_SPEED);
-        analogWrite(rightSpeed, NORMAL_SPEED);
-    }
-    else if(currentAction == leftTurn){ //Giro 90 grados
-        NinetyGegreeTurn(false);
-    }
-    else if (currentAction == leftCorrection) { //desvio derecha
-        Stright(true);
-        analogWrite(leftSpeed, REDUCED_SPEED);
-        analogWrite(rightSpeed, INCREASED_SPEED);
-    }
-    else if(currentAction == rightCorrection){ //desvio izquierda
-        Stright(true);
-        analogWrite(leftSpeed, INCREASED_SPEED);
-        analogWrite(rightSpeed, REDUCED_SPEED);
-    }
-    else if (currentAction == lost){ //parada
-        Stop();
+    switch (state)
+    {
+    case followingLine:
+        FollowLine();
+        break;
+    case turning:
+        Turning();
+        break;
+    case turnExit:
+        TurnExit();
+        break;
+    default:
+        break;
     }
 }
 
@@ -80,15 +67,18 @@ void MotorsController::Stop(){
     digitalWrite(backwardLeft, LOW);
 }
 
-void MotorsController::NinetyGegreeTurn(bool rightTurn){
+void MotorsController::NinetyGegreeTurn(){
     Stright(false);
     delay(100);
     Stop();
     delay(100);
-    turning = true;
+    state = turning;
     initialTurningYaw = gyroscopeController->GetAdverageYaw();
+    Turn();
+}
 
-    if(rightTurn){
+void MotorsController::Turn(){
+        if(turningDirection == right){
         analogWrite(leftSpeed, NORMAL_SPEED);
         analogWrite(rightSpeed, NORMAL_SPEED);
 
@@ -106,36 +96,57 @@ void MotorsController::NinetyGegreeTurn(bool rightTurn){
         digitalWrite(forwardRight, HIGH);
         digitalWrite(backwardRight, LOW);
     }
-
-}
-
-void MotorsController::OneEightyGegreeTurn(){
-    digitalWrite(forwardLeft, LOW);
-    digitalWrite(backwardLeft, HIGH);
-    digitalWrite(forwardRight, LOW);
-    digitalWrite(backwardRight, HIGH);
-    delay(460);
 }
 
 
-void MotorsController::Turn(){
-    if(abs(initialTurningYaw - gyroscopeController->GetCurrentYaw()) > 90.0f){
-        turning = false;
 
-        //provisional
+
+
+
+void MotorsController::FollowLine(){
+    Action currentAction = lineTracker->GetCurrentAction();
+ 
+    if(currentAction == straight){ //recto
+        Stright(true);
         analogWrite(leftSpeed, NORMAL_SPEED);
         analogWrite(rightSpeed, NORMAL_SPEED);
+    }
+    else if(currentAction == leftTurn){ //Giro 90 grados
+        turningDirection = left;
+        NinetyGegreeTurn();
+    }
+    else if (currentAction == leftCorrection) { //desvio derecha
+        Stright(true);
+        analogWrite(leftSpeed, REDUCED_SPEED);
+        analogWrite(rightSpeed, INCREASED_SPEED);
+    }
+    else if(currentAction == rightCorrection){ //desvio izquierda
+        Stright(true);
+        analogWrite(leftSpeed, INCREASED_SPEED);
+        analogWrite(rightSpeed, REDUCED_SPEED);
+    }
+    else if (currentAction == lost){ //parada
+        Stop();
+    }
+}
 
-        digitalWrite(forwardLeft, LOW);
-        digitalWrite(backwardLeft, HIGH);
-        digitalWrite(forwardRight, LOW);
-        digitalWrite(backwardRight, HIGH);
+void MotorsController::Turning(){
+    if(abs(initialTurningYaw - gyroscopeController->GetCurrentYaw()) > 90.0f){
+
+        turningDirection = (turningDirection == right) ? left: right;
+        Turn();
         delay(100);
+        turningDirection = none;
 
         Stop();
         delay(100);
         Stright(true);
+        state = turnExit;
         delay(300);
         gyroscopeController->ResetYaw();
     }
+}
+
+void MotorsController::TurnExit(){
+
 }
