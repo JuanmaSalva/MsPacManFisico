@@ -9,7 +9,8 @@
 #define REDUCED_SPEED 125
 #define INCREASED_SPEED 175
 
-#define TURN_EXIT_TIME 500
+#define TURNING_DEGREES_BUFFER 1.0
+#define MINIMUM_EXIT_TURN_TIME 300
 
 enum State{
     followingLine,
@@ -38,7 +39,8 @@ private:
     State state;
     float initialTurningYaw;
     TurningDirection turningDirection;
-    unsigned long initialTime;
+    long initialTime;
+    int perfectAngle; //el ángluo que deberia llevar el robot en relacion a la posicion de inicio
 
     void Stright(bool forwards);
     void Stop();

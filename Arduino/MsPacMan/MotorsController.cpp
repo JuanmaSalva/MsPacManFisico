@@ -4,6 +4,7 @@
 MotorsController::MotorsController(){
     state = followingLine;
     turningDirection = none;
+    perfectAngle = 0;
 }
 
 void MotorsController::Init(){
@@ -74,6 +75,8 @@ void MotorsController::NinetyGegreeTurn(){
     delay(100);
     state = turning;
     initialTurningYaw = gyroscopeController->GetAdverageYaw();
+    perfectAngle = perfectAngle - 90; //todo, cuando se gire a la derecha esto será +90
+    if(perfectAngle == -180) perfectAngle = 180;
     Turn();
 }
 
@@ -142,11 +145,29 @@ void MotorsController::Turning(){
         delay(100);
         Stright(true);
         state = turnExit;
-        delay(300);
+        initialTime = millis();
         gyroscopeController->ResetYaw();
     }
 }
 
 void MotorsController::TurnExit(){
-
+    if((abs(gyroscopeController->GetCurrentYaw() - (float)perfectAngle) < TURNING_DEGREES_BUFFER
+        ||
+        (abs(gyroscopeController->GetCurrentYaw() - (float)perfectAngle) < 180 +TURNING_DEGREES_BUFFER && 
+        abs(gyroscopeController->GetCurrentYaw() - (float)perfectAngle) > 180 - TURNING_DEGREES_BUFFER))
+        &&
+        millis() - initialTime > MINIMUM_EXIT_TURN_TIME)
+    {
+        state = followingLine;
+    } 
+    else if(gyroscopeController->GetCurrentYaw() < perfectAngle){ //corregimos a la derecha  
+        Stright(true);
+        analogWrite(leftSpeed, INCREASED_SPEED);
+        analogWrite(rightSpeed, REDUCED_SPEED/2);    
+    }
+    else if(gyroscopeController->GetCurrentYaw() > perfectAngle){ //corregimos a la izquierda   
+        Stright(true);
+        analogWrite(leftSpeed, REDUCED_SPEED/2);
+        analogWrite(rightSpeed, INCREASED_SPEED);  
+    }
 }
