@@ -10,54 +10,56 @@
 #define INCREASED_SPEED 175
 
 #define TURNING_DEGREES_BUFFER 1.0
-#define MINIMUM_EXIT_TURN_TIME 300
+#define MINIMUM_EXIT_TURN_TIME 400
 
 enum State{
-    followingLine,
-    turning,
-    turnExit
+	followingLine,
+	turning,
+	turnExit
 };
 
 enum TurningDirection{
-    left,
-    right,
-    none
+	left,
+	right,
+	none
 };
 
 class MotorsController{
 private:
-    int rightSpeed = 11;
-    int forwardRight = A0;
-    int backwardRight = A1;
-    int forwardLeft = A2;
-    int backwardLeft = A3;
-    int leftSpeed = 10;
+	int rightSpeed = 11;
+	int forwardRight = A0;
+	int backwardRight = A1;
+	int forwardLeft = A2;
+	int backwardLeft = A3;
+	int leftSpeed = 10;
 
-    LineTracker* lineTracker;
-    GyroscopeController* gyroscopeController;
+	LineTracker* lineTracker;
+	GyroscopeController* gyroscopeController;
 
-    State state;
-    float initialTurningYaw;
-    TurningDirection turningDirection;
-    long initialTime;
-    int perfectAngle; //el ángluo que deberia llevar el robot en relacion a la posicion de inicio
+	State state;
+	float initialTurningYaw;
+	TurningDirection turningDirection;
+	long initialTime;
+	int perfectAngle; //el ángluo que deberia llevar el robot en relacion a la posicion de inicio
 
-    void Stright(bool forwards);
-    void Stop();
+	void Stright(bool forwards);
+	void Stop();
 
-    void NinetyGegreeTurn();
+	void NinetyGegreeTurn();
 
-    void FollowLine();
-    void Turning();
-    void TurnExit();
-    
-    void Turn();
+	void FollowLine();
+	void Turning();
+	void TurnExit();
+	
+	void Turn();
+	bool IsInLine();
+	TurningDirection OverCorrectionDirection();
 
 public:
-    MotorsController();
-    void Init();
-    void Update();
+	MotorsController();
+	void Init();
+	void Update();
 
-    void SetLineTracker(LineTracker* _lineTracker);
-    void SetGyroscopeController(GyroscopeController* _gyroscopeController);
+	void SetLineTracker(LineTracker* _lineTracker);
+	void SetGyroscopeController(GyroscopeController* _gyroscopeController);
 };
