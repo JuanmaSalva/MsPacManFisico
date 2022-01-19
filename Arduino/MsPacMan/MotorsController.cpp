@@ -151,15 +151,16 @@ void MotorsController::Turning(){
 }
 
 void MotorsController::TurnExit(){
-    if((abs(gyroscopeController->GetCurrentYaw() - (float)perfectAngle) < TURNING_DEGREES_BUFFER
-        ||
-        (abs(gyroscopeController->GetCurrentYaw() - (float)perfectAngle) < 180 +TURNING_DEGREES_BUFFER && 
-        abs(gyroscopeController->GetCurrentYaw() - (float)perfectAngle) > 180 - TURNING_DEGREES_BUFFER))
-        &&
+    int currentYaw = gyroscopeController->GetCurrentYaw();
+    if(currentYaw < 0)
+        currentYaw = 180 + (- currentYaw);
+    Serial.println(currentYaw);
+        
+    if(abs(gyroscopeController->GetCurrentYaw() - (float)perfectAngle) < TURNING_DEGREES_BUFFER &&
         millis() - initialTime > MINIMUM_EXIT_TURN_TIME)
     {
         state = followingLine;
-    } 
+    }
     else if(gyroscopeController->GetCurrentYaw() < perfectAngle){ //corregimos a la derecha  
         Stright(true);
         analogWrite(leftSpeed, INCREASED_SPEED);
