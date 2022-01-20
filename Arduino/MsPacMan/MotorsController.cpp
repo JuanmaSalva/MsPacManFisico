@@ -70,18 +70,18 @@ void MotorsController::Stop(){
 
 void MotorsController::NinetyGegreeTurn(){
 	Stright(false);
-	delay(100);
+	delay(60);
 	Stop();
 	delay(100);
 	state = turning;
 	initialTurningYaw = gyroscopeController->GetAdverageYaw();
-	perfectAngle = perfectAngle - 90; //todo, cuando se gire a la derecha esto será +90
-	if(perfectAngle == -180) perfectAngle = 180;
+	perfectAngle += 270;
+	gyroscopeController->SetTargetYaw(perfectAngle);
 	Turn();
 }
 
 void MotorsController::Turn(){
-		if(turningDirection == right){
+	if(turningDirection == right){
 		analogWrite(leftSpeed, NORMAL_SPEED);
 		analogWrite(rightSpeed, NORMAL_SPEED);
 
@@ -134,8 +134,7 @@ void MotorsController::FollowLine(){
 }
 
 void MotorsController::Turning(){
-	if(abs(initialTurningYaw - gyroscopeController->GetCurrentYaw()) > 90.0f){
-
+	if(abs((perfectAngle % 360) - gyroscopeController->GetCurrentYaw()) < TURNING_DEGREES_BUFFER){
 		turningDirection = (turningDirection == right) ? left: right;
 		Turn();
 		delay(100);
@@ -151,33 +150,15 @@ void MotorsController::Turning(){
 }
 
 bool MotorsController::IsInLine(){
-	if(perfectAngle < 0){
-		return (abs(gyroscopeController->GetCurrentYaw() - (float)perfectAngle) < TURNING_DEGREES_BUFFER);
-	}
-	else {
-		float aux = gyroscopeController->GetCurrentYaw(); 
-		if(aux < 0)        
-			aux += 360;
-		return (abs(perfectAngle - aux) < TURNING_DEGREES_BUFFER);
-	}
+	return (abs((perfectAngle % 360) - gyroscopeController->GetCurrentYaw()) < TURNING_DEGREES_BUFFER);	
 }
 
 TurningDirection MotorsController::OverCorrectionDirection(){
-	if(perfectAngle < 0){
-		if(gyroscopeController->GetCurrentYaw() < perfectAngle)
-			return right;
-		else 
-			return left;
-	}
-	else {
-		float aux = gyroscopeController->GetCurrentYaw(); 
-		if(aux < 0)        
-			aux += 360;
-		if(aux < perfectAngle)
-			return right;
-		else 
-			return left;
-	}
+	float aux = gyroscopeController->GetCurrentYaw(); 
+	if(aux < (perfectAngle % 360))
+		return right;
+	else 
+		return left;
 }
 
 void MotorsController::TurnExit(){

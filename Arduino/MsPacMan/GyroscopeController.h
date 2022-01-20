@@ -19,6 +19,7 @@ private:
     float adverageYaw;
     float acumulatedYaw;
     int numberOfSamples = 0;
+    int targetYaw = 0;
 
 public:
 
@@ -29,4 +30,5 @@ public:
     float GetCurrentYaw();
     float GetAdverageYaw();
     void ResetYaw();
+    void SetTargetYaw(int newTargetYaw);
 };

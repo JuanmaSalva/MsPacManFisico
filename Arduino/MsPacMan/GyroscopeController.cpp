@@ -51,9 +51,12 @@ void GyroscopeController::Init(){
 
 void GyroscopeController::Update(){
     myMpu.dmp_read_fifo();
-    if(currentYaw < -150)
-        acumulatedYaw -= currentYaw;
-    else
+
+    if(targetYaw == 0 && currentYaw < 0)
+        acumulatedYaw += currentYaw;
+    else if(currentYaw < 0)
+        acumulatedYaw += (360 + currentYaw);
+    else 
         acumulatedYaw += currentYaw;
     numberOfSamples++;
     adverageYaw = acumulatedYaw / numberOfSamples;
@@ -61,7 +64,10 @@ void GyroscopeController::Update(){
 }
 
 float GyroscopeController::GetCurrentYaw(){
-    return currentYaw;
+    if(currentYaw < 0)
+        return 360 + currentYaw;
+    else
+        return currentYaw;
 }
 
 float GyroscopeController::GetAdverageYaw(){
@@ -71,4 +77,8 @@ float GyroscopeController::GetAdverageYaw(){
 void GyroscopeController::ResetYaw(){
     numberOfSamples = 0;
     acumulatedYaw = 0;
+}
+
+void GyroscopeController::SetTargetYaw(int newTargetYaw){
+    targetYaw = newTargetYaw;
 }
