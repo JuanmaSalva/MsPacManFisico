@@ -150,7 +150,17 @@ void MotorsController::Turning(){
 }
 
 bool MotorsController::IsInLine(){
-	return (abs((perfectAngle % 360) - gyroscopeController->GetCurrentYaw()) < TURNING_DEGREES_BUFFER);	
+	int angleModule = perfectAngle % 360;
+
+	if(angleModule == 0){
+		if(gyroscopeController->GetCurrentYaw() < TURNING_DEGREES_BUFFER ||
+		gyroscopeController->GetCurrentYaw() > 360 - TURNING_DEGREES_BUFFER)
+			return true;
+		else 
+			return false;
+	}
+	else
+		return (abs(angleModule - gyroscopeController->GetCurrentYaw()) < TURNING_DEGREES_BUFFER);	
 }
 
 TurningDirection MotorsController::OverCorrectionDirection(){
