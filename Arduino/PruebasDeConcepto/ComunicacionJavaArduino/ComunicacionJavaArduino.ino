@@ -13,9 +13,10 @@ void setup() {
   analogWrite(verde, 0);
   analogWrite(azul, 0);
 
+  
   Serial.begin(9600);
-  while(!Serial)
-    ;
+  while(!Serial);
+  Serial.println(10);
 }
 
 void loop() {
