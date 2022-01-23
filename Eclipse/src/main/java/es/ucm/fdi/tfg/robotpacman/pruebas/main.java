@@ -9,7 +9,7 @@ public class main {
 	public static void main(String[] args) throws IOException, InterruptedException{
 		System.out.println("Vamos a inicializar el arduino");
 	
-		SerialPort sp = SerialPort.getCommPort("/dev/ttyACM9"); //TODO esto deberia estar parametrizado
+		SerialPort sp = SerialPort.getCommPort("/dev/ttyACM0"); //TODO esto deberia estar parametrizado
 		sp.setComPortParameters(9600, 8, 1, 0);
 		sp.setComPortTimeouts(SerialPort.TIMEOUT_READ_BLOCKING | SerialPort.TIMEOUT_WRITE_BLOCKING, 0, 0);
 		

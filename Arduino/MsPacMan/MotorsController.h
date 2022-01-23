@@ -42,8 +42,6 @@ private:
 	long initialTime;
 	int perfectAngle; //el ángluo que deberia llevar el robot en relacion a la posicion de inicio
 
-	void Stright(bool forwards);
-	void Stop();
 
 	void NinetyGegreeTurn();
 
@@ -56,6 +54,9 @@ private:
 	TurningDirection OverCorrectionDirection();
 
 public:
+	void Stright(bool forwards); //Provisional para probar el bletooh, volver a provado luego
+	void Stop();
+
 	MotorsController();
 	void Init();
 	void Update();
