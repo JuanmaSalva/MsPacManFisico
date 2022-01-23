@@ -16,8 +16,6 @@ void MotorsController::Init(){
 	pinMode(leftSpeed, OUTPUT);
 
 	Stright(true);
-	digitalWrite(rightSpeed, REDUCED_SPEED);
-	digitalWrite(leftSpeed, REDUCED_SPEED);
 	//delay(50); //para empezar con velocidad
 }
 
@@ -60,6 +58,9 @@ void MotorsController::Stright(bool forwards){
 		digitalWrite(forwardRight, LOW);
 		digitalWrite(backwardRight, HIGH);
 	}
+	
+	digitalWrite(rightSpeed, REDUCED_SPEED);
+	digitalWrite(leftSpeed, REDUCED_SPEED);
 }
 
 void MotorsController::Stop(){

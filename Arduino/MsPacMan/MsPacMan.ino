@@ -23,16 +23,16 @@ RECIEVE_DATA_STRUCTURE myData;
 
 
 void setup() {
-	/*lineTracker = new LineTracker();
+	lineTracker = new LineTracker();
 	lineTracker->Init();
 
 	gyroscopeController = new GyroscopeController();
-	gyroscopeController->Init();*/
+	gyroscopeController->Init();
 
 	motorsController = new MotorsController();
 	motorsController->Init();
-	//motorsController->SetLineTracker(lineTracker);
-	//motorsController->SetGyroscopeController(gyroscopeController);
+	motorsController->SetLineTracker(lineTracker);
+	motorsController->SetGyroscopeController(gyroscopeController);
 
 
 	//Serial.begin(9600);
@@ -45,11 +45,11 @@ void setup() {
 
 
 void loop() {
-	/*lineTracker->Update();
+	lineTracker->Update();
 	gyroscopeController->Update();
-	motorsController->Update();*/
+	motorsController->Update();
 
-  	if(ET.receiveData() && myData.number == 2){
-		  motorsController->Stop();
-	}
+  	/*if(ET.receiveData() && myData.number == 2){
+		  motorsController->Stright(true);
+	}*/
 }
