@@ -9,33 +9,41 @@ GyroscopeController* gyroscopeController;
 CommunicationManager* communicationManager;
 
 void setup() {
-	lineTracker = new LineTracker();
-	lineTracker->Init();
-
-	gyroscopeController = new GyroscopeController();
-	gyroscopeController->Init();
-
-	motorsController = new MotorsController();
-	motorsController->Init();
-	motorsController->SetLineTracker(lineTracker);
-	motorsController->SetGyroscopeController(gyroscopeController);
-
+	Serial.begin(9600);
 	communicationManager = new CommunicationManager();
 	communicationManager->Init();
 
-	Serial.begin(9600);
+	
+	// lineTracker = new LineTracker();
+	// lineTracker->Init();
+
+	// gyroscopeController = new GyroscopeController();
+	// gyroscopeController->Init();
+
+	// motorsController = new MotorsController();
+	// motorsController->Init();
+	//motorsController->SetLineTracker(lineTracker);
+	//motorsController->SetGyroscopeController(gyroscopeController);
+
+
+
+
+	// motorsController->SetLineTracker(lineTracker);
+	// motorsController->SetGyroscopeController(gyroscopeController);
+
+
 }
 
 
 void loop() {
-	if(communicationManager->Start()){
-		lineTracker->Update();
-		gyroscopeController->Update();
-		motorsController->Update();
-		//motorsController->Stright(true);
+	// if(communicationManager->Start()){
+	// 	lineTracker->Update();
+	// 	gyroscopeController->Update();
+	// 	motorsController->Update();
+	// 	//motorsController->Stright(true);
 
-	}
-	Serial.println("Loop");
-	communicationManager->Update();
+	// }
+	// Serial.println("Loop");
+	// communicationManager->Update();
 	
 }

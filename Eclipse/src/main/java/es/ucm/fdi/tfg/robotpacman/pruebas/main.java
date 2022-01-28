@@ -18,7 +18,7 @@ public class main {
 		if(sp.openPort()) {
 			System.out.println("Puerto abierto");
 			sp.getInputStream().close();
-			Thread.sleep(5000); //Tiempo para que se inicialice el arduino
+			Thread.sleep(2000); //Tiempo para que se inicialice el arduino
 		}
 		else {
 			System.out.println("ERROR: No se pudo abrir el puerto");
