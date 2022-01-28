@@ -1,33 +1,19 @@
 #include "LineTracker.h"
 #include "MotorsController.h"
 #include "GyroscopeController.h"
-
-#include <SoftEasyTransfer.h>
-#include <SoftwareSerial.h>
+#include "CommunicationManager.h"
 
 LineTracker* lineTracker;
 MotorsController* motorsController;
 GyroscopeController* gyroscopeController;
-
-SoftwareSerial miBT(3,9);
-
-SoftEasyTransfer ET;
-
-struct RECIEVE_DATA_STRUCTURE{
-	int8_t id;
-	int8_t number;
-};
-
-
-RECIEVE_DATA_STRUCTURE myData;
-
+CommunicationManager* communicationManager;
 
 void setup() {
-	/*lineTracker = new LineTracker();
+	lineTracker = new LineTracker();
 	lineTracker->Init();
 
 	gyroscopeController = new GyroscopeController();
-	gyroscopeController->Init();*/
+	gyroscopeController->Init();
 
 	motorsController = new MotorsController();
 	motorsController->Init();
@@ -35,35 +21,44 @@ void setup() {
 	//motorsController->SetGyroscopeController(gyroscopeController);
 
 
-	Serial.begin(9600);
+	// Serial.begin(9600);
 
-	miBT.begin(38400);
-	ET.begin(details(myData), &miBT);
+	// miBT.begin(38400);
+	// ET.begin(details(myData), &miBT);
 	
 
-	myData.number = 100;
-	//bucle hasta recibir mensaje del servidor
-	while(true){
-		ET.sendData();
-		Serial.println("intentnado sincronizar");
-		if(ET.receiveData()){
-			//ambos modulos están conectados
-			motorsController->Stright(true);
-			Serial.println("SINCRONIZADOS");
+	// myData.number = 100;
+	// //bucle hasta recibir mensaje del servidor
+	// while(true){
+	// 	ET.sendData();
+	// 	Serial.println("intentnado sincronizar");
+	// 	if(ET.receiveData()){
+	// 		//ambos modulos están conectados
+	// 		motorsController->Stright(true);
+	// 		Serial.println("SINCRONIZADOS");
 			
-			break;
-		}
-	}
+	// 		break;
+	// 	}
+	// }
+	motorsController->SetLineTracker(lineTracker);
+	motorsController->SetGyroscopeController(gyroscopeController);
 
+	communicationManager = new CommunicationManager();
+	communicationManager->Init();
+
+	Serial.begin(9600);
 }
 
 
 void loop() {
-	/*lineTracker->Update();
-	gyroscopeController->Update();
-	motorsController->Update();*/
+	if(communicationManager->Start()){
+		lineTracker->Update();
+		gyroscopeController->Update();
+		motorsController->Update();
+		//motorsController->Stright(true);
 
-  	// if(ET.receiveData() && myData.number == 2){
-	// 	  motorsController->Stright(true);
-	// }
+	}
+	Serial.println("Loop");
+	communicationManager->Update();
+	
 }

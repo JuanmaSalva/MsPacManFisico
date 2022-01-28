@@ -62,7 +62,8 @@ public class main {
 			e.printStackTrace();
 			System.out.println("ERROR: No se ha podido mandar el dato");
 		}
-			
+
+		sp.getInputStream().close(); //limpiamos antes de cerrar para cuando se vuelva a abrir	
 		if(sp.closePort()) {
 			System.out.println("Puerto cerrado");	
 		}
