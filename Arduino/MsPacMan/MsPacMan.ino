@@ -23,12 +23,19 @@ void setup() {
 	communicationManager = new CommunicationManager();
 	communicationManager->Init();
 
-	//Serial.begin(9600);
+	Serial.begin(9600);
 }
 
 
 void loop() {
-	lineTracker->Update();
-	gyroscopeController->Update();
-	motorsController->Update();
+	if(communicationManager->Start()){
+		lineTracker->Update();
+		gyroscopeController->Update();
+		motorsController->Update();
+		//motorsController->Stright(true);
+
+	}
+	Serial.println("Loop");
+	communicationManager->Update();
+	
 }
