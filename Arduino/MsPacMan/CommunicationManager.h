@@ -17,9 +17,13 @@ private:
 	SoftwareSerial miBT;
 
 	SoftEasyTransfer ET;
+
+	bool start = false;
 public:
 	CommunicationManager();
 
 	void Init();
 	void Update();
+
+	bool Start();
 };
