@@ -4,9 +4,14 @@
 SoftwareSerial miBT(5,6); //pines de recibir, mandar
 SoftEasyTransfer ET; 
 
+enum ENTITY_STATE{
+	SYNC_ATTEMP,
+	SYNC
+};
+
 struct RECIEVE_DATA_STRUCTURE{
-	int8_t id;
-	int8_t number;
+	int8_t id; //robot id
+	ENTITY_STATE ent_state;
 };
 
 RECIEVE_DATA_STRUCTURE myData;
@@ -36,11 +41,10 @@ void setup() {
 
 
 	while(true){
-		Serial.println("...");
-		if(ET.receiveData()){
+		if(ET.receiveData() && myData.ent_state == SYNC_ATTEMP){
 			
 			Serial.println("Modulos conectados");
-			myData.number = 100;
+			myData.ent_state = SYNC;
 			ET.sendData();
 			break;
 		}

@@ -9,6 +9,11 @@ GyroscopeController* gyroscopeController;
 CommunicationManager* communicationManager;
 
 void setup() {
+	Serial.begin(9600);
+	communicationManager = new CommunicationManager();
+	communicationManager->Init();
+
+	
 	// lineTracker = new LineTracker();
 	// lineTracker->Init();
 
@@ -21,14 +26,11 @@ void setup() {
 	//motorsController->SetGyroscopeController(gyroscopeController);
 
 
-	Serial.begin(9600);
 
 
 	// motorsController->SetLineTracker(lineTracker);
 	// motorsController->SetGyroscopeController(gyroscopeController);
 
-	communicationManager = new CommunicationManager();
-	communicationManager->Init();
 
 }
 

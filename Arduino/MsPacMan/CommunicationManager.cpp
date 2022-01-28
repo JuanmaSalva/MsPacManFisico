@@ -1,9 +1,6 @@
 #include "CommunicationManager.h"
 
-
-SoftwareSerial miBT(3,9);
-
-CommunicationManager::CommunicationManager()
+CommunicationManager::CommunicationManager(): miBT(3,9)
 {
 }
 
@@ -13,12 +10,13 @@ void CommunicationManager::Init(){
 	ET.begin(details(myData), &miBT);
 	
 
-	myData.number = 100;
+	myData.ent_state = SYNC_ATTEMP;
+
 	//bucle hasta recibir mensaje del servidor
 	while(true){
 		ET.sendData();
 		Serial.println("intentnado sincronizar");
-		if(ET.receiveData()){
+		if(ET.receiveData() && myData.ent_state == SYNC){
 			//ambos modulos están conectados
 			Serial.println("SINCRONIZADOS");
 			
