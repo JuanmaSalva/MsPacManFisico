@@ -33,19 +33,32 @@ void setup() {
 	miBT.begin(38400);
 	ET.begin(details(myData), &miBT);
 	myData.id = 0;
+
+
+	while(true){
+		if(ET.receiveData() && myData.number == 100){
+			Serial.println("Modulos conectados");
+			myData.number = 100;
+			ET.sendData();
+			break;
+		}
+	}
+
 }
 
 void loop() {
-	if(Serial.available() > 0){
-		byte incomingByte = Serial.read();
 
-		if(incomingByte != -1){
-			analogWrite(rojo, 0);
-			analogWrite(verde, 255);
-			analogWrite(azul, 0);  
+
+	// if(Serial.available() > 0){
+	// 	byte incomingByte = Serial.read();
+
+	// 	if(incomingByte != -1){
+	// 		analogWrite(rojo, 0);
+	// 		analogWrite(verde, 255);
+	// 		analogWrite(azul, 0);  
 			
-			myData.number = 2;
-			ET.sendData();
-		}
-	}
+			// myData.number = 2;
+			// ET.sendData();
+	// 	}
+	// }
 }

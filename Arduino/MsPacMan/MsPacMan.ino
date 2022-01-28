@@ -35,11 +35,25 @@ void setup() {
 	//motorsController->SetGyroscopeController(gyroscopeController);
 
 
-	//Serial.begin(9600);
+	Serial.begin(9600);
 
 	miBT.begin(38400);
 	ET.begin(details(myData), &miBT);
-  
+	
+
+	myData.number = 100;
+	//bucle hasta recibir mensaje del servidor
+	while(true){
+		ET.sendData();
+		Serial.println("intentnado sincronizar");
+		if(ET.receiveData()){
+			//ambos modulos están conectados
+			motorsController->Stright(true);
+			Serial.println("SINCRONIZADOS");
+			
+			break;
+		}
+	}
 
 }
 
@@ -49,7 +63,7 @@ void loop() {
 	gyroscopeController->Update();
 	motorsController->Update();*/
 
-  	if(ET.receiveData() && myData.number == 2){
-		  motorsController->Stop();
-	}
+  	// if(ET.receiveData() && myData.number == 2){
+	// 	  motorsController->Stright(true);
+	// }
 }
