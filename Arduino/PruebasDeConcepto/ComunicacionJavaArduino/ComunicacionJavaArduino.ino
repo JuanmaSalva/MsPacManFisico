@@ -36,7 +36,9 @@ void setup() {
 
 
 	while(true){
-		if(ET.receiveData() && myData.number == 100){
+		Serial.println("...");
+		if(ET.receiveData()){
+			
 			Serial.println("Modulos conectados");
 			myData.number = 100;
 			ET.sendData();

@@ -10,11 +10,9 @@ struct RECIEVE_DATA_STRUCTURE{
 };
 
 
-
 class CommunicationManager{
 private:
 	RECIEVE_DATA_STRUCTURE myData;
-	SoftwareSerial miBT;
 
 	SoftEasyTransfer ET;
 
