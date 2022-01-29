@@ -16,24 +16,10 @@ struct RECIEVE_DATA_STRUCTURE{
 
 RECIEVE_DATA_STRUCTURE myData;
 
-int rojo = 9;
-int verde = 10;
-int azul = 11;
-
 
 void setup() {
-	pinMode(rojo, OUTPUT);
-	pinMode(verde, OUTPUT);
-	pinMode(azul, OUTPUT);
-
-	analogWrite(rojo, 255);
-	analogWrite(verde, 0);
-	analogWrite(azul, 0);
-
-
 	Serial.begin(9600);
 	while(!Serial);
-	Serial.println(10);
 
 	miBT.begin(38400);
 	ET.begin(details(myData), &miBT);
@@ -41,6 +27,7 @@ void setup() {
 
 
 	while(true){
+    Serial.println("Intentenado sincronizar");
 		if(ET.receiveData() && myData.ent_state == SYNC_ATTEMP){
 			
 			Serial.println("Modulos conectados");
@@ -49,7 +36,6 @@ void setup() {
 			break;
 		}
 	}
-
 }
 
 void loop() {

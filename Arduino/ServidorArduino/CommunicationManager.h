@@ -1,8 +1,6 @@
 #pragma once
-#include <Arduino.h>
 #include <SoftEasyTransfer.h>
 #include <SoftwareSerial.h>
-
 
 enum ENTITY_STATE{
 	SYNC_ATTEMP,
@@ -19,9 +17,10 @@ struct MESSAGE{
 };
 
 
+
 class CommunicationManager{
 private:
-	MESSAGE recivMsg;
+	MESSAGE recvMsg;
 	MESSAGE sendMsg;
 
 	SoftwareSerial miBT;
@@ -29,16 +28,17 @@ private:
 	SoftEasyTransfer et_in;
 	SoftEasyTransfer et_out;
 
-	int8_t id;
-	bool start = false;
+    int red = 9;
+    int green = 10;
+    int blue = 11;
+
 public:
-	CommunicationManager();
+    CommunicationManager();
 
-	void Init();
-	void Sync();
-	void Update();
-	void SendMsg(ENTITY_STATE msg);
-	void WaitApproval();
+    void Init();
+    void Sync();
+    void WaitForRobotToInitialize();
 
-	bool Start();
+
+
 };

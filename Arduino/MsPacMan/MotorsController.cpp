@@ -15,6 +15,7 @@ void MotorsController::Init(){
 	pinMode(backwardLeft, OUTPUT);
 	pinMode(leftSpeed, OUTPUT);
 
+	Stop();
 	//Stright(true);
 	//delay(50); //para empezar con velocidad
 }

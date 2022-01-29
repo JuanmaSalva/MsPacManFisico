@@ -5,29 +5,26 @@ CommunicationManager::CommunicationManager(): miBT(3,9)
 }
 
 void CommunicationManager::Init(){
-
 	miBT.begin(38400);
-	ET.begin(details(myData), &miBT);
-	
+	et_in.begin(details(recivMsg), &miBT);
+	et_out.begin(details(sendMsg), &miBT);
+}
 
-	myData.ent_state = SYNC_ATTEMP;
+void CommunicationManager::Sync(){
+	sendMsg.ent_state = SYNC_ATTEMP;
 
 	//bucle hasta recibir mensaje del servidor
 	while(true){
-		ET.sendData();
-		Serial.println("intentnado sincronizar");
-		if(ET.receiveData() && myData.ent_state == SYNC){
+		if(et_in.receiveData()){
 			//ambos modulos están conectados
 			Serial.println("SINCRONIZADOS");
-			
+			id = recivMsg.id;
 			break;
 		}
+		et_out.sendData();
+		Serial.println("intentnado sincronizar");
+		
 	}
-
-
-	// miBT.begin(38400);
-	// ET.begin(details(myData), &miBT);
-	// start = false;
 }
 
 void CommunicationManager::Update(){
@@ -35,6 +32,19 @@ void CommunicationManager::Update(){
     //     //[...]
 	// 	start = true;
 	// }
+}
+
+void CommunicationManager::SendMsg(ENTITY_STATE msg){
+	sendMsg.ent_state = msg;
+	et_out.sendData();
+}
+
+void CommunicationManager::WaitApproval(){
+	while(true){
+		if(et_in.receiveData() && recivMsg.ent_state == OK){
+			break;
+		}
+	}
 }
 
 bool CommunicationManager::Start(){
