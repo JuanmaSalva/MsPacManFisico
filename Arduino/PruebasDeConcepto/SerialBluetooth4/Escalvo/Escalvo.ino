@@ -1,10 +1,10 @@
-#include <SoftEasyTransfer.h>
+//#include <SoftEasyTransfer.h>
 #include <SoftwareSerial.h>
 
-SoftwareSerial miBT(10,11);
+SoftwareSerial miBT(3,9);
 
 
-int LEDROJO = A2;
+/*int LEDROJO = A2;
 int LEDVERDE = A1;
 int LEDAZUL = A0;
 
@@ -17,21 +17,21 @@ struct RECIEVE_DATA_STRUCTURE{
 
 
 RECIEVE_DATA_STRUCTURE myData;
-
+*/
 void setup() {
   Serial.begin(9600);
   Serial.println("Iniciamos");
-  miBT.begin(38400);
-  ET.begin(details(myData), &miBT);
+  miBT.begin(9600);
+  //ET.begin(details(myData), &miBT);
   
-  pinMode(LEDROJO, OUTPUT);
+  /*pinMode(LEDROJO, OUTPUT);
   pinMode(LEDVERDE, OUTPUT);
   pinMode(LEDAZUL, OUTPUT);
 
   analogWrite(LEDROJO, 255);
   analogWrite(LEDVERDE, 255);
   analogWrite(LEDAZUL, 255);
-  
+  */
 }
 
 void configuracion(){
@@ -43,10 +43,10 @@ void configuracion(){
 }
 
 void loop(){
-  if(ET.receiveData()){
-    Serial.print("ID: ");
-    Serial.print(myData.id);
-    Serial.print(", Data read: ");
-    Serial.println(myData.number);
+  if(miBT.available()){
+    Serial.println(miBT.read());
+    miBT.flush();
+    miBT.print('b');
+    miBT.flush();
   }
 }

@@ -10,7 +10,6 @@ enum ENTITY_STATE{
 	LINE_TRACKER_INITIALIZED,
 	GYROSCOPE_INITIALIZED,
 	MOTORS_INITIALIZES,
-    OK
 };
 
 struct MESSAGE{
@@ -18,11 +17,15 @@ struct MESSAGE{
 	ENTITY_STATE ent_state;
 };
 
+struct MESSAGE_RESPONSE{
+	bool ok;
+};
+
 
 class CommunicationManager{
 private:
 	MESSAGE recivMsg;
-	MESSAGE sendMsg;
+	MESSAGE_RESPONSE sendMsg;
 
 	SoftwareSerial miBT;
 
@@ -37,7 +40,7 @@ public:
 	void Init();
 	void Sync();
 	void Update();
-	void SendMsg(ENTITY_STATE msg);
+	//void SendMsg(ENTITY_STATE msg);
 	void WaitApproval();
 
 	bool Start();
