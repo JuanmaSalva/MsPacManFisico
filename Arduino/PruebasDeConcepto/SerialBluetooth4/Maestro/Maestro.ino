@@ -27,10 +27,6 @@ void configuracion(){
 }
 
 void loop(){
-  
-  /*if(ET.receiveData()){
-    Serial.println("AAAAAAAAAAAAAAAAAAAAAAAAA");
-  }*/
   if(miBT.available()){
     Serial.println(miBT.read());
   }
