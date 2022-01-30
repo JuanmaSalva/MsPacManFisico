@@ -13,7 +13,12 @@ struct RECIEVE_DATA_STRUCTURE{
   int8_t number;
 };
 
-RECIEVE_DATA_STRUCTURE myDataIn;
+enum RESPONSE{
+  OK,
+  ERR
+};
+
+RESPONSE myDataIn;
 RECIEVE_DATA_STRUCTURE myDataOut;
 
 
@@ -27,19 +32,26 @@ void setup() {
   ET_out.begin(details(myDataOut), &miBT);
 
   myDataOut.id = 0;
+
+  while(true){
+    miBT.flush();
+    ET_out.sendData();
+    miBT.flush();
+
+    if(ET_in.receiveData()){
+      Serial.println("Sincronizados");
+      break;
+    }
+    
+    delay(10);
+  }
 }
 
 
 void loop(){
-  if(ET_in.receiveData()){
-    Serial.println(myDataIn.id);
-  }
+
   
-  miBT.flush();
-  ET_out.sendData();
-  miBT.flush();
-  
-  delay(10);
+
   /*if(miBT.available()){
     Serial.println(miBT.read());
   }
