@@ -16,11 +16,6 @@ class CommunicationManager{
 private:
 	SoftwareSerial miBT;
 
-
-    int red = 9;
-    int green = 10;
-    int blue = 11;
-
 	void SendMsg(MESSAGE msg);
 	MESSAGE ReadMsg();
 

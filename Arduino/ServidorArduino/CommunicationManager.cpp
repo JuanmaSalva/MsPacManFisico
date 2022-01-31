@@ -2,17 +2,10 @@
 
 CommunicationManager::CommunicationManager(): miBT(5,6)
 {
-	pinMode(red, OUTPUT);
-	pinMode(green, OUTPUT);
-	pinMode(blue, OUTPUT);
 }
 
 void CommunicationManager::Init(){
 	miBT.begin(9600);
-
-	analogWrite(red, 255);
-	analogWrite(green, 0);
-	analogWrite(blue, 0);
 }
 
 
@@ -20,10 +13,7 @@ void CommunicationManager::Sync(){
 	while(true){
 		if(miBT.available()){
 			MESSAGE msg = ReadMsg();
-			if(msg == SYNC){
-				analogWrite(red, 0);
-				analogWrite(green, 255);
-				analogWrite(blue, 0);		
+			if(msg == SYNC){	
 				break;		
 			}
 		}

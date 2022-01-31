@@ -18,7 +18,7 @@ public class main {
 		if(sp.openPort()) {
 			System.out.println("Puerto abierto");
 			sp.getInputStream().close();
-			Thread.sleep(2000); //Tiempo para que se inicialice el arduino
+			//Thread.sleep(2000); //Tiempo para que se inicialice el arduino
 		}
 		else {
 			System.out.println("ERROR: No se pudo abrir el puerto");
@@ -35,33 +35,33 @@ public class main {
 		
 		boolean start = false;
 		
+		
 		while(!start) {
-			int byteRead = 0;
+			
 			try {
+				Integer i = 20;
+				sp.getOutputStream().write(i.byteValue());
+				sp.getOutputStream().flush();
+				
+			} catch (IOException e) {
+				e.printStackTrace();
+				System.out.println("ERROR: No se ha podido mandar el dato");
+			}
+						
+			try {
+				int byteRead = 0;
 				byteRead = sp.getInputStream().read();
+				
+				if(byteRead == 10) {
+					start = true;
+				}
 			} catch(IOException e) {
 				System.out.println("ERROR: Ha fallado la lectura de datos");
 			}
 			
-			if(byteRead == 10) {
-				System.out.println("Dato correcto");
-				start = true;
-			}
-			else
-				System.out.println("Dato incorrecto");
 		}
-		
-		
-		try {
-			Integer i = 1;
-			sp.getOutputStream().write(i.byteValue());
-			sp.getOutputStream().flush();
-			System.out.println("DatoMandado");
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.out.println("ERROR: No se ha podido mandar el dato");
-		}
+
+		System.out.println("SINCRONIZADOS");	
 
 		sp.getInputStream().close(); //limpiamos antes de cerrar para cuando se vuelva a abrir	
 		if(sp.closePort()) {
