@@ -1,34 +1,20 @@
+#include <SoftEasyTransfer.h>
 #include <SoftwareSerial.h>
 
-SoftwareSerial miBT(5,6);
+SoftwareSerial miBT(10,11);
+SoftEasyTransfer ET; 
 
-enum MESSAGE{
-  SYNC_ATTEMP,
-  SYNC,
-  OK
+struct RECIEVE_DATA_STRUCTURE{
+  int8_t id;
+  int8_t number;
 };
 
-MESSAGE msg;
+RECIEVE_DATA_STRUCTURE myData;
 
 void setup() {
-  Serial.begin(9600);
-  Serial.println("Inicializamos");
-  miBT.begin(9600);
-
-
-  while(true){
-    if(miBT.available()){
-      int val = miBT.read();
-      Serial.println("Sincronizados" + val);
-      break;
-    }
-    miBT.flush();
-    msg = SYNC_ATTEMP;
-    int i = 0;
-    miBT.write(i);
-    miBT.flush();
-    delay(5);
-  }
+  miBT.begin(38400);
+  ET.begin(details(myData), &miBT);
+  myData.id = 0;
 }
 
 void configuracion(){
@@ -40,4 +26,13 @@ void configuracion(){
 }
 
 void loop(){
+  myData.number = 10;
+  ET.sendData();
+  delay(200);
+  myData.number = 20;
+  ET.sendData();
+  delay(200);
+  myData.number = 30;
+  ET.sendData();
+  delay(200);
 }

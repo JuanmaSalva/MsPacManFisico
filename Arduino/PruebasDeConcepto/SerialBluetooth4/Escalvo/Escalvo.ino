@@ -1,36 +1,37 @@
+#include <SoftEasyTransfer.h>
 #include <SoftwareSerial.h>
 
-SoftwareSerial miBT(3,9);
+SoftwareSerial miBT(10,11);
 
-enum MESSAGE{
-  SYNC_ATTEMP,
-  SYNC,
-  OK
+
+int LEDROJO = A2;
+int LEDVERDE = A1;
+int LEDAZUL = A0;
+
+SoftEasyTransfer ET;
+
+struct RECIEVE_DATA_STRUCTURE{
+  int8_t id;
+  int8_t number;
 };
 
-MESSAGE msg;
+
+RECIEVE_DATA_STRUCTURE myData;
 
 void setup() {
   Serial.begin(9600);
   Serial.println("Iniciamos");
-  miBT.begin(9600);
+  miBT.begin(38400);
+  ET.begin(details(myData), &miBT);
+  
+  pinMode(LEDROJO, OUTPUT);
+  pinMode(LEDVERDE, OUTPUT);
+  pinMode(LEDAZUL, OUTPUT);
 
-  while(true){
-    if(miBT.available()){
-      int val = miBT.read();
-      msg = (MESSAGE)val;
-      if(msg == SYNC_ATTEMP){
-        Serial.println("SYNC_ATTEMP");        
-      }
-      
-      miBT.flush();
-      msg = SYNC;
-      int i = 1;
-      miBT.write(i);
-      miBT.flush();
-      break;
-    }
-  }
+  analogWrite(LEDROJO, 255);
+  analogWrite(LEDVERDE, 255);
+  analogWrite(LEDAZUL, 255);
+  
 }
 
 void configuracion(){
@@ -42,5 +43,10 @@ void configuracion(){
 }
 
 void loop(){
-
+  if(ET.receiveData()){
+    Serial.print("ID: ");
+    Serial.print(myData.id);
+    Serial.print(", Data read: ");
+    Serial.println(myData.number);
+  }
 }
