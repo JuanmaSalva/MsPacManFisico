@@ -5,6 +5,10 @@
 enum MESSAGE{
 	SYNC_ATTEMP,
 	SYNC,
+	LINE_TRACKER_INITIALIZED,
+	GYROSCOPE_INITIALIZED,
+	MOTORS_INITIALIZES,
+
 	OK
 };
 
@@ -26,7 +30,7 @@ public:
     void Init();
     void Sync();
     void WaitForRobotToInitialize();
-
+	void WaitForMsg(MESSAGE msg);
 
 
 };

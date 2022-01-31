@@ -9,7 +9,7 @@ void setup() {
 	communicationManager = new CommunicationManager();
 	communicationManager->Init();
 	communicationManager->Sync();
-	//communicationManager->WaitForRobotToInitialize();
+	communicationManager->WaitForRobotToInitialize();
 }
 
 void loop() {

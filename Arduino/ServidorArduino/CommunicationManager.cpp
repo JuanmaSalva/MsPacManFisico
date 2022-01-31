@@ -36,44 +36,36 @@ void CommunicationManager::Sync(){
 
 void CommunicationManager::SendMsg(MESSAGE msg){
 	miBT.flush();
-	int val = (int)msg;
-	miBT.write(val);
+	miBT.write((int)msg);
 	miBT.flush();
 }
 
 MESSAGE CommunicationManager::ReadMsg(){
-	int val = miBT.read();
-	MESSAGE msg = (MESSAGE)val;
+	MESSAGE msg = (MESSAGE)miBT.read();
 	return msg;
 }
 
 void CommunicationManager::WaitForRobotToInitialize(){
-	// while (true)
-	// {
-	// 	Serial.println("Esperando sensores linea");
-	// 	if(et_in.receiveData() && recvMsg.ent_state == LINE_TRACKER_INITIALIZED){
-	// 		Serial.println("\nSensores de linea inicializados");
-	// 		sendMsg.ent_state = OK;
-	// 		et_out.sendData();
-	// 		break;
-	// 	}
-	// }
-	// while(true){
-	// 	Serial.println("Esperando goroscopio");
-	// 	if(et_in.receiveData() && recvMsg.ent_state == GYROSCOPE_INITIALIZED){
-	// 		Serial.println("\nGiroscopio inicializados");
-	// 		sendMsg.ent_state = OK;
-	// 		et_out.sendData();
-	// 		break;
-	// 	}
-	// }
-	// while(true){
-	// 	Serial.println("Esperando motores");
-	// 	if(et_in.receiveData() && recvMsg.ent_state == MOTORS_INITIALIZES){
-	// 		Serial.println("\nMotores inicializados");
-	// 		sendMsg.ent_state = OK;
-	// 		et_out.sendData();
-	// 		break;
-	// 	}
-	// }
+	WaitForMsg(LINE_TRACKER_INITIALIZED);
+	Serial.println("Sensores Linea Inicializados");
+	
+	WaitForMsg(GYROSCOPE_INITIALIZED);
+	Serial.println("Giroscopio Inicializados");
+	
+	WaitForMsg(MOTORS_INITIALIZES);
+	Serial.println("Motores Inicializados");
+}
+
+void CommunicationManager::WaitForMsg(MESSAGE msg){
+	while (true)
+	{
+		if(miBT.available()){
+			MESSAGE msg = ReadMsg();
+			if(msg == msg){
+				SendMsg(OK);
+				break;
+			}
+		}
+		delay(5);
+	}
 }

@@ -6,6 +6,10 @@
 enum MESSAGE{
 	SYNC_ATTEMP,
 	SYNC,
+	LINE_TRACKER_INITIALIZED,
+	GYROSCOPE_INITIALIZED,
+	MOTORS_INITIALIZES,
+
 	OK
 };
 
@@ -25,5 +29,7 @@ public:
 
 	void SendMsg(MESSAGE msg);
 	MESSAGE ReadMsg();
+
+	void WaitApproval();
 
 };

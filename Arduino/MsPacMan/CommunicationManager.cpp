@@ -27,15 +27,25 @@ void CommunicationManager::Sync(){
 
 void CommunicationManager::SendMsg(MESSAGE msg){
 	miBT.flush();
-	int val = (int)msg;
-	miBT.write(val);
+	miBT.write((int)msg);
 	miBT.flush();
 }
 
 MESSAGE CommunicationManager::ReadMsg(){
-	int val = miBT.read();
-	MESSAGE msg = (MESSAGE)val;
+	MESSAGE msg = (MESSAGE)miBT.read();
 	return msg;
+}
+
+void CommunicationManager::WaitApproval(){
+	while(true){
+		if(miBT.available()){
+			MESSAGE msg = ReadMsg();
+			if(msg == OK){
+				return;
+			}
+		}
+		delay(5);
+	}
 }
 
 
