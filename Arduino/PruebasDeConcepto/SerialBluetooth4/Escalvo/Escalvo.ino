@@ -2,6 +2,14 @@
 
 SoftwareSerial miBT(3,9);
 
+enum MESSAGE{
+  SYNC_ATTEMP,
+  SYNC,
+  OK
+};
+
+MESSAGE msg;
+
 void setup() {
   Serial.begin(9600);
   Serial.println("Iniciamos");
@@ -9,9 +17,16 @@ void setup() {
 
   while(true){
     if(miBT.available()){
-      Serial.println("Sincronizados");
+      int val = miBT.read();
+      msg = (MESSAGE)val;
+      if(msg == SYNC_ATTEMP){
+        Serial.println("SYNC_ATTEMP");        
+      }
+      
       miBT.flush();
-      miBT.write('b');
+      msg = SYNC;
+      int i = 1;
+      miBT.write(i);
       miBT.flush();
       break;
     }
