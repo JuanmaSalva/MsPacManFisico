@@ -9,8 +9,6 @@ CommunicationManager::CommunicationManager(): miBT(5,6)
 
 void CommunicationManager::Init(){
 	miBT.begin(9600);
-	et_in.begin(details(recvMsg), &miBT);
-	et_out.begin(details(sendMsg), &miBT);
 
 	analogWrite(red, 255);
 	analogWrite(green, 0);
@@ -20,11 +18,33 @@ void CommunicationManager::Init(){
 
 void CommunicationManager::Sync(){
 	while(true){
-		Serial.println("Intentando sincronizar");
-		sendMsg.ent_state = SYNC_ATTEMP;
-		et_out.sendData();
-		delay(100);	
+		if(miBT.available()){
+			MESSAGE msg = ReadMsg();
+			if(msg == SYNC){
+				analogWrite(red, 0);
+				analogWrite(green, 255);
+				analogWrite(blue, 0);		
+				break;		
+			}
+		}
+
+		SendMsg(SYNC_ATTEMP);
+
+		delay(50);
 	}
+}
+
+void CommunicationManager::SendMsg(MESSAGE msg){
+	miBT.flush();
+	int val = (int)msg;
+	miBT.write(val);
+	miBT.flush();
+}
+
+MESSAGE CommunicationManager::ReadMsg(){
+	int val = miBT.read();
+	MESSAGE msg = (MESSAGE)val;
+	return msg;
 }
 
 void CommunicationManager::WaitForRobotToInitialize(){

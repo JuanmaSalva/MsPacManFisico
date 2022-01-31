@@ -6,8 +6,6 @@ CommunicationManager::CommunicationManager(): miBT(3,9)
 
 void CommunicationManager::Init(){
 	miBT.begin(9600);
-	et_in.begin(details(recivMsg), &miBT);
-	et_out.begin(details(sendMsg), &miBT);
 }
 
 void CommunicationManager::Sync(){
@@ -16,35 +14,30 @@ void CommunicationManager::Sync(){
 
 	while(true){
 		if(miBT.available()){
-			Serial.println("Hay putos datos de mierda hostia ya");
+			MESSAGE msg = ReadMsg();
+			if(msg == SYNC_ATTEMP){
+				SendMsg(SYNC);
+				Serial.println("Sincronizados");
+				break;
+			}
 		}
-		// if(et_in.receiveData()){
-		// 	Serial.println("Peticion");
-		// 	break;
-		//}		
 	}
 }
 
+
+void CommunicationManager::SendMsg(MESSAGE msg){
+	miBT.flush();
+	int val = (int)msg;
+	miBT.write(val);
+	miBT.flush();
+}
+
+MESSAGE CommunicationManager::ReadMsg(){
+	int val = miBT.read();
+	MESSAGE msg = (MESSAGE)val;
+	return msg;
+}
+
+
 void CommunicationManager::Update(){
-    // if(ET.receiveData()){
-    //     //[...]
-	// 	start = true;
-	// }
-}
-
-// void CommunicationManager::SendMsg(ENTITY_STATE msg){
-// 	// sendMsg.ent_state = msg;
-// 	// et_out.sendData();
-// }
-
-void CommunicationManager::WaitApproval(){
-	// while(true){
-	// 	if(et_in.receiveData() && recivMsg.ent_state == OK){
-	// 		break;
-	// 	}
-	// }
-}
-
-bool CommunicationManager::Start(){
-	return start;
 }

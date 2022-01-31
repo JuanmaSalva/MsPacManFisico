@@ -13,9 +13,6 @@ void setup() {
 	communicationManager = new CommunicationManager();
 	communicationManager->Init();
 	communicationManager->Sync();
-	while(true){
-		Serial.println("FUNCIONA");
-	}
 
 	// lineTracker = new LineTracker();
 	// lineTracker->Init();
