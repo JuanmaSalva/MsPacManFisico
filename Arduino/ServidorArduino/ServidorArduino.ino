@@ -1,6 +1,8 @@
 #include "CommunicationManager.h"
+#include "ServerManager.h"
 
 CommunicationManager* communicationManager;
+ServerManager* serverManager;
 
 int red = 9;
 int green = 10;
@@ -19,30 +21,24 @@ void setup() {
 	analogWrite(green, 0);
 	analogWrite(blue, 0);
 
-	// communicationManager = new CommunicationManager();
-	// communicationManager->Init();
-	// communicationManager->Sync();
-	// communicationManager->WaitForRobotToInitialize();
 
-	while(true){
-		if(Serial.available()){
-			int aux = Serial.read();
-			if(aux == 20){
-				Serial.flush();
-				int val = 10;
-				Serial.write(val);
-				Serial.flush();
-				break;
-			}
-		}
+	serverManager = new ServerManager();
+	serverManager->SyncToJava();
 
-		delay(5);
-	}
+	analogWrite(red, 0);
+	analogWrite(green, 0);
+	analogWrite(blue, 255);
+
+	communicationManager = new CommunicationManager();
+	communicationManager->Init();
+	communicationManager->Sync();
+	communicationManager->WaitForRobotToInitialize();
 
 
 	analogWrite(red, 0);
 	analogWrite(green, 255);
-	analogWrite(blue, 0);	
+	analogWrite(blue, 0);
+	
 }
 
 void loop() {

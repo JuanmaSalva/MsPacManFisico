@@ -6,7 +6,8 @@ import com.fazecast.jSerialComm.SerialPort;
 
 public class main {
 
-	public static void main(String[] args) throws IOException, InterruptedException{
+	public static void main(String[] args) throws IOException, InterruptedException{		
+		
 		System.out.println("Vamos a inicializar el arduino");
 	
 		SerialPort sp = SerialPort.getCommPort("/dev/ttyACM0"); //TODO esto deberia estar parametrizado
@@ -39,8 +40,8 @@ public class main {
 		while(!start) {
 			
 			try {
-				Integer i = 20;
-				sp.getOutputStream().write(i.byteValue());
+				JAVA_MESSAGE msg = JAVA_MESSAGE.SYNC_ATTEMP;				
+				sp.getOutputStream().write((byte)msg.ordinal());
 				sp.getOutputStream().flush();
 				
 			} catch (IOException e) {
@@ -51,10 +52,15 @@ public class main {
 			try {
 				int byteRead = 0;
 				byteRead = sp.getInputStream().read();
-				
-				if(byteRead == 10) {
-					start = true;
+				if(byteRead < JAVA_MESSAGE.values().length)
+				{
+					JAVA_MESSAGE msg = JAVA_MESSAGE.values()[byteRead];
+					
+					if(msg == JAVA_MESSAGE.SYNC) {
+						start = true;
+					}
 				}
+					
 			} catch(IOException e) {
 				System.out.println("ERROR: Ha fallado la lectura de datos");
 			}
