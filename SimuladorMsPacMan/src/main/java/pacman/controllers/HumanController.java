@@ -1,8 +1,9 @@
 package pacman.controllers;
 
 import java.awt.event.KeyEvent;
-import java.util.concurrent.TimeUnit;
 
+import es.ucm.fdi.tfg.robotpacman.pruebas.CommunicationManager;
+import es.ucm.fdi.tfg.robotpacman.pruebas.JAVA_MESSAGE;
 import pacman.game.Constants.MOVE;
 import pacman.game.Game;
 
@@ -22,8 +23,20 @@ public class HumanController extends PacmanController {
 
     @Override
     public MOVE getMove(Game game, long dueTime) {
-        //        System.out.println("Returned: " + input.getKey());    	
-        switch (input.getKey()) {
+        //        System.out.println("Returned: " + input.getKey());    
+    	
+    	if(game.isJunction(game.getPacmanCurrentNodeIndex())) {
+    		System.out.println("Estamos en una interseccion");
+    		CommunicationManager.MessageSender.SendMsg(JAVA_MESSAGE.OK);
+    		try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				System.out.println("El sleep de la interseccion en el PacMan ha fallado");
+				e.printStackTrace();
+			}
+    	}
+    	
+    	switch (input.getKey()) {
             case KeyEvent.VK_UP:
                 return MOVE.UP;
             case KeyEvent.VK_RIGHT:
