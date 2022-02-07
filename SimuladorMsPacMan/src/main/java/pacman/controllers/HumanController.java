@@ -25,28 +25,48 @@ public class HumanController extends PacmanController {
     public MOVE getMove(Game game, long dueTime) {
         //        System.out.println("Returned: " + input.getKey());    
     	
+    	//TODO esto deberia estar en una clase padre o algo
     	if(game.isJunction(game.getPacmanCurrentNodeIndex())) {
-    		System.out.println("Estamos en una interseccion");
-    		CommunicationManager.MessageSender.SendMsg(JAVA_MESSAGE.OK);
+    		
+    		MOVE move;
+    		
+    		switch (input.getKey()) {
+		        case KeyEvent.VK_UP:{
+		            move = MOVE.UP;		            
+		    		CommunicationManager.MessageSender.SendMsg(JAVA_MESSAGE.PAC_MAN_UP);	
+		    		break;
+		        }
+		        case KeyEvent.VK_RIGHT:{
+		            move = MOVE.RIGHT;
+		    		CommunicationManager.MessageSender.SendMsg(JAVA_MESSAGE.PAC_MAN_RIGHT);		
+		    		break;        	
+		        }
+		        case KeyEvent.VK_DOWN:{
+		            move = MOVE.DOWN;
+		    		CommunicationManager.MessageSender.SendMsg(JAVA_MESSAGE.PAC_MAN_DOWN);	
+		    		break;	        	
+		        }
+		        case KeyEvent.VK_LEFT:{
+		            move = MOVE.LEFT;
+		    		CommunicationManager.MessageSender.SendMsg(JAVA_MESSAGE.PAC_MAN_LEFT);	
+		    		break;	        	
+		        }
+		        default:{
+		        	move = MOVE.NEUTRAL;
+		        	CommunicationManager.MessageSender.SendMsg(JAVA_MESSAGE.PAC_MAN_NEUTRAL);	
+		        	break;
+		        }
+    		}
+    		
     		try {
-				Thread.sleep(500);
+				Thread.sleep(250);
 			} catch (InterruptedException e) {
 				System.out.println("El sleep de la interseccion en el PacMan ha fallado");
 				e.printStackTrace();
 			}
+    		
+    		return move;
     	}
-    	
-    	switch (input.getKey()) {
-            case KeyEvent.VK_UP:
-                return MOVE.UP;
-            case KeyEvent.VK_RIGHT:
-                return MOVE.RIGHT;
-            case KeyEvent.VK_DOWN:
-                return MOVE.DOWN;
-            case KeyEvent.VK_LEFT:
-                return MOVE.LEFT;
-            default:
-                return MOVE.NEUTRAL;
-        }
+    	else return MOVE.NEUTRAL;
     }
 }

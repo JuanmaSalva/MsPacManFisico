@@ -28,6 +28,8 @@ public class main {
 		}
 		
 		
+		CommunicationManager.MessageSender.SetSerialPort(sp);
+		
 		try {
 			sp.getInputStream().close();
 		} catch (IOException e1) {

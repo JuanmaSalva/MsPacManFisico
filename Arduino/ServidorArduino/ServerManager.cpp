@@ -1,7 +1,6 @@
 #include "ServerManager.h"
 
 ServerManager::ServerManager(){
-
 }
 
 void ServerManager::SyncToJava(){
