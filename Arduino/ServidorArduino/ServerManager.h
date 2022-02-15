@@ -3,8 +3,12 @@
 
 
 enum JAVA_MESSAGE{
-    JAVA_SYNC_ATTEMP,
-    JAVA_SYNC,
+    JAVA_SYNC_ATTEMP = 0,
+    JAVA_SYNC = 1,
+    PAC_MAN_UP,
+    PAC_MAN_RIGHT,
+    PAC_MAN_DOWN,
+    PAC_MAN_LEFT,
 
     JAVA_OK
 };
@@ -13,12 +17,12 @@ enum JAVA_MESSAGE{
 class ServerManager{
 private:
 
-    void SendMsg(JAVA_MESSAGE msg);
-    JAVA_MESSAGE ReadMsg();
 
 public:
     ServerManager();
 
     void SyncToJava();
 
+    void SendMsg(JAVA_MESSAGE msg);
+    JAVA_MESSAGE ReadMsg();
 };

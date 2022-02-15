@@ -2,6 +2,7 @@
 
 import pacman.Executor;
 import pacman.controllers.GhostController;
+import pacman.controllers.GhostsRandom;
 import pacman.controllers.HumanController;
 import pacman.controllers.KeyBoardInput;
 import pacman.controllers.PacmanController;
@@ -29,6 +30,7 @@ public class ExecutorTest {
         System.out.println( 
         		executor.runGame(pacMan, ghosts, 40)
         );
+        System.out.println("CERRADO");
         
     }
 }

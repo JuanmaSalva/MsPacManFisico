@@ -1,7 +1,6 @@
 package pacman.controllers;
 
 import java.awt.event.KeyEvent;
-import java.util.concurrent.TimeUnit;
 
 import pacman.game.Constants.MOVE;
 import pacman.game.Game;
@@ -22,18 +21,24 @@ public class HumanController extends PacmanController {
 
     @Override
     public MOVE getMove(Game game, long dueTime) {
-        //        System.out.println("Returned: " + input.getKey());    	
-        switch (input.getKey()) {
-            case KeyEvent.VK_UP:
-                return MOVE.UP;
-            case KeyEvent.VK_RIGHT:
-                return MOVE.RIGHT;
-            case KeyEvent.VK_DOWN:
-                return MOVE.DOWN;
-            case KeyEvent.VK_LEFT:
-                return MOVE.LEFT;
-            default:
-                return MOVE.NEUTRAL;
-        }
+        //        System.out.println("Returned: " + input.getKey());    
+		switch (input.getKey()) {
+	        case KeyEvent.VK_UP:{
+	            return MOVE.UP;		  
+	        }
+	        case KeyEvent.VK_RIGHT:{
+	            return MOVE.RIGHT;
+	        }
+	        case KeyEvent.VK_DOWN:{
+	            return MOVE.DOWN;	
+	        }
+	        case KeyEvent.VK_LEFT:{
+	            return MOVE.LEFT;	
+	        }
+	        default:{
+	        	return MOVE.NEUTRAL;
+	        }
+		}   		
+
     }
 }

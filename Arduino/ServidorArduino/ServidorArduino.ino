@@ -29,23 +29,33 @@ void setup() {
 	analogWrite(green, 0);
 	analogWrite(blue, 255);
 
-	communicationManager = new CommunicationManager();
-	communicationManager->Init();
-	communicationManager->Sync();
-	communicationManager->WaitForRobotToInitialize();
+	// communicationManager = new CommunicationManager();
+	// communicationManager->Init();
+	// communicationManager->Sync();
+	// communicationManager->WaitForRobotToInitialize();
 
 
-	analogWrite(red, 0);
-	analogWrite(green, 255);
-	analogWrite(blue, 0);
+	// analogWrite(red, 0);
+	// analogWrite(green, 255);
+	// analogWrite(blue, 0);
 	
 }
 
 void loop() {
-
-
-	// if(Serial.available()){
-	// 	byte incomingByte = Serial.read();
-	// 	Serial.println("ByteRecibido");
-	// }
+	if(Serial.available()){
+		JAVA_MESSAGE msg = serverManager->ReadMsg();
+		
+		if(msg == PAC_MAN_UP){
+			Serial.println("Up");
+		}
+		else if(msg == PAC_MAN_RIGHT){
+			Serial.println("Right");	
+		}
+		else if(msg == PAC_MAN_DOWN){
+			Serial.println("Down");	
+		}
+		else if(msg == PAC_MAN_LEFT){
+			Serial.println("Left");	
+		}
+	}
 }
