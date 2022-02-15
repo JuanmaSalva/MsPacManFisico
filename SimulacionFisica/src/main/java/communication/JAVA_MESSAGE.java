@@ -1,4 +1,4 @@
-package es.ucm.fdi.tfg.robotpacman.pruebas;
+package communication;
 
 public enum JAVA_MESSAGE {
     SYNC_ATTEMP,

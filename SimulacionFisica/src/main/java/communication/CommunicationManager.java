@@ -1,4 +1,4 @@
-package es.ucm.fdi.tfg.robotpacman.pruebas;
+package communication;
 
 import com.fazecast.jSerialComm.SerialPort;
 

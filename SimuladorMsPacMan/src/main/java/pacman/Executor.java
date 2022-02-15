@@ -394,16 +394,16 @@ public class Executor {
     }
 
     private GameView setupGameView(Controller<MOVE> pacManController, Game game) {
-        GameView gv;
+    	GameView gv;
         gv = new GameView(game, setDaemon);
         gv.setScaleFactor(scaleFactor);
         gv.showGame();
-        if(pacmanPOvisual) gv.setPacManPO(this.pacmanPO);
-        if(ghostsPOvisual) gv.setGhostPO(this.ghostPO);
+        if(pacmanPOvisual) gv.setPO(this.pacmanPO);
+        //if(ghostsPOvisual) gv.setGhostPO(this.ghostPO);
         if (pacManController instanceof HumanController) {
             gv.setFocusable(true);
             gv.requestFocus();
-            gv.setPacManPO(this.pacmanPO);
+            gv.setPO(this.pacmanPO);
             gv.addKeyListener(((HumanController) pacManController).getKeyboardInput());
         }
 

@@ -1,22 +1,22 @@
-package es.ucm.fdi.tfg.robotpacman.pruebas;
+package main;
 
 import java.io.IOException;
 
-import com.fazecast.jSerialComm.SerialPort;
-
-/*import pacman.Executor;
+import pacman.Executor;
 import pacman.controllers.GhostController;
 import pacman.controllers.GhostsRandom;
 import pacman.controllers.HumanController;
 import pacman.controllers.KeyBoardInput;
 import pacman.controllers.PacmanController;
-import pacman.game.internal.POType;*/
+import pacman.game.internal.POType;
+
 
 public class main {
 
 	public static void main(String[] args) throws IOException, InterruptedException{		
 		
-		System.out.println("Vamos a inicializar el arduino");
+		startExecution();
+		/*System.out.println("Vamos a inicializar el arduino");
 	
 		SerialPort sp = SerialPort.getCommPort("/dev/ttyACM0"); //TODO esto deberia estar parametrizado
 		sp.setComPortParameters(9600, 8, 1, 0);
@@ -90,29 +90,31 @@ public class main {
 		}
 		else {
 			System.out.println("ERROR: no se ha podido cerrar el puerto");		
-		}
+		}*/
 	}
 	
 	
 	
-	/*void startExecution() {
-	        Executor executor = new Executor.Builder()
-	                .setTickLimit(4000)
-	                .setTimeLimit(40)
-	                .setGhostPO(false)
-	                .setPacmanPO(false)
-	                .setPacmanPOvisual(false) 
-	                .setPOType(POType.LOS)
-	                .setVisual(true)
-	                .setScaleFactor(3.0)
-	                .build();
-	
-	        PacmanController pacMan = //new pacman.controllers.examples.PacManRandom();
-	        						new HumanController(new KeyBoardInput());
-	        GhostController ghosts = new GhostsRandom();
-	        
-	        System.out.println( 
-	        		executor.runGame(pacMan, ghosts, 40)
-	        );	    
-	}*/
+	static void startExecution() {
+        Executor executor = new Executor.Builder()
+                .setTickLimit(4000)
+                .setTimeLimit(40)
+                .setGhostPO(false)
+                .setPacmanPO(false)
+                .setPacmanPOvisual(false) 
+                .setPOType(POType.LOS)
+                .setVisual(true)
+                .setScaleFactor(3.0)
+                .build();
+
+        PacmanController pacMan = //new pacman.controllers.examples.PacManRandom();
+        						new HumanController(new KeyBoardInput());
+        GhostController ghosts = new GhostsRandom();
+        MsPacManObserver observer = new MsPacManObserver();
+        
+        System.out.println( 
+        		executor.runGame(pacMan, ghosts, 40, observer)
+        );
+        System.out.println("CERRADO");    
+	}
 }
