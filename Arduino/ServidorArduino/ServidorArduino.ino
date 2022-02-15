@@ -45,17 +45,17 @@ void loop() {
 	if(Serial.available()){
 		JAVA_MESSAGE msg = serverManager->ReadMsg();
 		
-		if(msg == PAC_MAN_NORTH){
-			Serial.println("Norte");
+		if(msg == PAC_MAN_UP){
+			Serial.println("Up");
 		}
-		else if(msg == PAC_MAN_EAST){
-			Serial.println("East");	
+		else if(msg == PAC_MAN_RIGHT){
+			Serial.println("Right");	
 		}
-		else if(msg == PAC_MAN_SOUTH){
-			Serial.println("South");	
+		else if(msg == PAC_MAN_DOWN){
+			Serial.println("Down");	
 		}
-		else if(msg == PAC_MAN_WEST){
-			Serial.println("West");	
+		else if(msg == PAC_MAN_LEFT){
+			Serial.println("Left");	
 		}
 	}
 }

@@ -4,6 +4,14 @@ import java.io.IOException;
 
 import com.fazecast.jSerialComm.SerialPort;
 
+/*import pacman.Executor;
+import pacman.controllers.GhostController;
+import pacman.controllers.GhostsRandom;
+import pacman.controllers.HumanController;
+import pacman.controllers.KeyBoardInput;
+import pacman.controllers.PacmanController;
+import pacman.game.internal.POType;*/
+
 public class main {
 
 	public static void main(String[] args) throws IOException, InterruptedException{		
@@ -18,8 +26,7 @@ public class main {
 		
 		if(sp.openPort()) {
 			System.out.println("Puerto abierto");
-			sp.getInputStream().close();
-			
+			sp.getInputStream().close();			
 			//Thread.sleep(2000); //Tiempo para que se inicialice el arduino
 		}
 		else {
@@ -71,6 +78,11 @@ public class main {
 		}
 
 		System.out.println("SINCRONIZADOS");	
+		
+		
+		//INICIAR EL SIMULADOR
+		
+		
 
 		sp.getInputStream().close(); //limpiamos antes de cerrar para cuando se vuelva a abrir	
 		if(sp.closePort()) {
@@ -80,5 +92,27 @@ public class main {
 			System.out.println("ERROR: no se ha podido cerrar el puerto");		
 		}
 	}
-
+	
+	
+	
+	/*void startExecution() {
+	        Executor executor = new Executor.Builder()
+	                .setTickLimit(4000)
+	                .setTimeLimit(40)
+	                .setGhostPO(false)
+	                .setPacmanPO(false)
+	                .setPacmanPOvisual(false) 
+	                .setPOType(POType.LOS)
+	                .setVisual(true)
+	                .setScaleFactor(3.0)
+	                .build();
+	
+	        PacmanController pacMan = //new pacman.controllers.examples.PacManRandom();
+	        						new HumanController(new KeyBoardInput());
+	        GhostController ghosts = new GhostsRandom();
+	        
+	        System.out.println( 
+	        		executor.runGame(pacMan, ghosts, 40)
+	        );	    
+	}*/
 }

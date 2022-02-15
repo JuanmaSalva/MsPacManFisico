@@ -3,6 +3,7 @@ package pacman;
 import static pacman.game.Constants.DELAY;
 import static pacman.game.Constants.INTERVAL_WAIT;
 
+import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -20,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import pacman.controllers.Controller;
 import pacman.controllers.GhostController;
 import pacman.controllers.HumanController;
+import pacman.controllers.KeyBoardInput;
 import pacman.game.Constants.MOVE;
 import pacman.game.Drawable;
 import pacman.game.Game;
@@ -348,7 +350,7 @@ public class Executor {
 
             if (visuals) {
                 gv.repaint();
-            }
+            }            
         }
         System.out.println(game.getScore());
         

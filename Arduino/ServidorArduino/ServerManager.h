@@ -5,10 +5,10 @@
 enum JAVA_MESSAGE{
     JAVA_SYNC_ATTEMP = 0,
     JAVA_SYNC = 1,
-    PAC_MAN_NORTH,
-    PAC_MAN_EAST,
-    PAC_MAN_SOUTH,
-    PAC_MAN_WEST,
+    PAC_MAN_UP,
+    PAC_MAN_RIGHT,
+    PAC_MAN_DOWN,
+    PAC_MAN_LEFT,
 
     JAVA_OK
 };

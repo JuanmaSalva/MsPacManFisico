@@ -1,9 +1,8 @@
-
+package pacman.controllers;
 
 import java.util.EnumMap;
 import java.util.Random;
 
-import pacman.controllers.GhostController;
 import pacman.game.Constants.GHOST;
 import pacman.game.Constants.MOVE;
 import pacman.game.Game;
