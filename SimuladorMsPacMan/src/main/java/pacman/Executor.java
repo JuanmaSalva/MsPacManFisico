@@ -3,7 +3,6 @@ package pacman;
 import static pacman.game.Constants.DELAY;
 import static pacman.game.Constants.INTERVAL_WAIT;
 
-import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -12,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.Random;
 import java.util.function.Function;
 
@@ -21,10 +21,11 @@ import org.slf4j.LoggerFactory;
 import pacman.controllers.Controller;
 import pacman.controllers.GhostController;
 import pacman.controllers.HumanController;
-import pacman.controllers.KeyBoardInput;
+import pacman.game.Constants.GHOST;
 import pacman.game.Constants.MOVE;
 import pacman.game.Drawable;
 import pacman.game.Game;
+import pacman.game.GameObserver;
 import pacman.game.GameView;
 import pacman.game.comms.BasicMessenger;
 import pacman.game.comms.Messenger;
@@ -54,7 +55,8 @@ public class Executor {
     private final Function<Game, String> peek;
     private final Logger logger = LoggerFactory.getLogger(Executor.class);
 	private boolean pacmanPOvisual;
-    private static String VERSION = "2.2.0 (ICI 20/21 - Evaluator Included)";
+	private boolean ghostsPOvisual;
+	private static String VERSION = "3.4.0(ICI 21-22 major improvements PO)";
 
     public static class Builder {
         private boolean pacmanPO = false;
@@ -70,6 +72,8 @@ public class Executor {
         private int sightLimit = 50;
         private Function<Game, String> peek = null;
 		private boolean pacmanPOvisual;
+		private boolean ghostsPOvisual;
+		
 
         public Builder setPacmanPO(boolean po) {
             this.pacmanPO = po;
@@ -139,11 +143,16 @@ public class Executor {
 
         public Executor build() {
         	System.err.println("MsPacMan Engine - Ingeniería de Comportamientos Inteligentes. Version "+Executor.VERSION);
-            return new Executor(pacmanPO, ghostPO, ghostsMessage, messenger, scaleFactor, setDaemon, visuals, tickLimit, timeLimit, poType, sightLimit, peek, pacmanPOvisual);
+            return new Executor(pacmanPO, ghostPO, ghostsMessage, messenger, scaleFactor, setDaemon, visuals, tickLimit, timeLimit, poType, sightLimit, peek, pacmanPOvisual, ghostsPOvisual);
         }
 
 		public Builder setPacmanPOvisual(boolean b) {
 			this.pacmanPOvisual = b;
+			return this;
+		}
+		
+		public Builder setGhostsPOvisual(boolean b) {
+			this.ghostsPOvisual = b;
 			return this;
 		}
     }
@@ -161,7 +170,8 @@ public class Executor {
             POType poType,
             int sightLimit,
             Function<Game, String> peek,
-            boolean pacmanPOvisual
+            boolean pacmanPOvisual,
+            boolean ghostsPOvisual
             ) {
         this.pacmanPO = pacmanPO;
         this.ghostPO = ghostPO;
@@ -176,6 +186,7 @@ public class Executor {
         this.sightLimit = sightLimit;
         this.peek = peek;
         this.pacmanPOvisual = pacmanPOvisual;
+        this.ghostsPOvisual = ghostsPOvisual;
     }
 
     private static void writeStat(FileWriter writer, Stats stat, int i) throws IOException {
@@ -251,7 +262,7 @@ public class Executor {
         for (int i = 0; i < trials; ) {
             try {
                 game = setupGame();
-                precompute(pacManController, ghostController);
+                precompute(pacManController, ghostControllerCopy);
                 while (!game.gameOver()) {
                     if (tickLimit != -1 && tickLimit < game.getTotalTime()) {
                         break;
@@ -267,6 +278,7 @@ public class Executor {
                 postcompute(pacManController, ghostController);
                 System.out.println("Game finished: " + i + "   " + description);
             } catch (Exception e) {
+            	System.err.println("ERROR runExperiment: "+pacManController.getClass().getCanonicalName() + " vs "+ghostControllerCopy.getClass().getCanonicalName());
                 e.printStackTrace();
             }
         }
@@ -350,7 +362,7 @@ public class Executor {
 
             if (visuals) {
                 gv.repaint();
-            }            
+            }
         }
         System.out.println(game.getScore());
         
@@ -386,11 +398,12 @@ public class Executor {
         gv = new GameView(game, setDaemon);
         gv.setScaleFactor(scaleFactor);
         gv.showGame();
-        if(pacmanPOvisual) gv.setPO(this.pacmanPO);
+        if(pacmanPOvisual) gv.setPacManPO(this.pacmanPO);
+        if(ghostsPOvisual) gv.setGhostPO(this.ghostPO);
         if (pacManController instanceof HumanController) {
             gv.setFocusable(true);
             gv.requestFocus();
-            gv.setPO(this.pacmanPO);
+            gv.setPacManPO(this.pacmanPO);
             gv.addKeyListener(((HumanController) pacManController).getKeyboardInput());
         }
 
@@ -611,5 +624,57 @@ public class Executor {
                 gv.repaint();
             }
         }
+    }
+    
+    
+    /**
+     * Run a game in asynchronous mode and notifies observer: the game waits until a move is returned. In order to slow thing down in case
+     * the controllers return very quickly, a time limit can be used. If fasted gameplay is required, this delay
+     * should be put as 0.
+     *
+     * @param pacManController The Pac-Man controller
+     * @param ghostController  The Ghosts controller
+     * @param delay            The delay between time-steps
+     */
+    public int runGame(Controller<MOVE> pacManController, GhostController ghostController, int delay, GameObserver observer) {
+        Game game = setupGame();
+
+        precompute(pacManController, ghostController);
+        
+        GameView gv = (visuals) ? setupGameView(pacManController, game) : null;
+
+        GhostController ghostControllerCopy = ghostController.copy(ghostPO);
+
+        while (!game.gameOver()) {
+            if (tickLimit != -1 && tickLimit < game.getTotalTime()) {
+                break;
+            }
+            handlePeek(game);
+            MOVE pacManMove = pacManController.getMove(getPacmanCopy(game), System.currentTimeMillis() + timeLimit);
+            EnumMap<GHOST,MOVE> ghostsMove = ghostControllerCopy.getMove(getGhostsCopy(game), System.currentTimeMillis() + timeLimit);
+            
+            EnumMap<GHOST,Boolean> ghostsJunction = new EnumMap<GHOST,Boolean>(GHOST.class);
+            for(GHOST g: GHOST.values())
+            	ghostsJunction.put(g, game.isJunction(game.getGhostCurrentNodeIndex(g)));
+            observer.ghostsMove(ghostsMove, ghostsJunction);
+            
+            observer.pacManMove(pacManMove, game.isJunction(game.getPacmanCurrentNodeIndex()));
+            
+            game.advanceGame(pacManMove, ghostsMove);
+
+            try {
+                Thread.sleep(delay);
+            } catch (Exception e) {
+            }
+
+            if (visuals) {
+                gv.repaint();
+            }
+        }
+        System.out.println(game.getScore());
+        
+        postcompute(pacManController, ghostController);
+        
+        return game.getScore();
     }
 }
