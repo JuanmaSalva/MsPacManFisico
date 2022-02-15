@@ -135,7 +135,7 @@ public class PacManEvaluator {
 		    		Stats[] result = executor.runExperiment(pacMan, ghosts, trials, pacMan.getClass().getName()+ " - " + ghosts.getClass().getName());
 		    		scores.put(pacMan.getName(),ghosts.getName(), result[0]);
 	        	}catch(Exception e) {
-	        		System.err.println("Error ejecutando pacman "+p+"  ghost: "+g);
+	        		System.err.println("Error executing pacman "+p+"  ghost: "+g);
 	        		System.err.println(e);	
 	        	}
 	        }
