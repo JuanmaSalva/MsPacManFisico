@@ -22,7 +22,7 @@ void setup() {
   BMI160.setAccelerometerRate(25);
   Serial.println("Initializing IMU device...done.");
 
-  filter.begin(25);
+  //filter.begin(25);
 
   Serial.println("Curie Init");
 }
@@ -46,13 +46,13 @@ void loop() {
   ay = convertRawAcceleration(ayRaw);
   az = convertRawAcceleration(azRaw);
 
-  filter.updateIMU(gx, gy, gz, ax, ay, az);
 
-  float yaw = filter.getYaw();
+  float yaw = lsb_to_ms2(gz, 8, 16);
 
+  
   Serial.println(yaw);
 
-  //delay(250);
+  //delay(100);
 }
 
 float convertRawGyro(int gRaw) {
@@ -72,4 +72,21 @@ float convertRawAcceleration(int aRaw) {
   
   float a = (aRaw * 2.0) / 32768.0;
   return a;
+}
+
+
+
+
+
+
+
+#define GRAVITY_EARTH   (9.80665f) /* Earth's gravity in m/s^2 */
+#define RAD             (57.2957805f)
+#define INV_RAD         (0.01745329f)
+
+float lsb_to_ms2(int16_t val, float g_range, uint8_t bit_width)
+{
+  float half_scale = (float)(1 << bit_width) / 2.0f;
+
+  return GRAVITY_EARTH * val * g_range / half_scale;
 }
