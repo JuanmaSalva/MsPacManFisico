@@ -13,7 +13,10 @@ void ShowValues(int16_t *gyro, int16_t *accel, int32_t *quat, uint32_t *timestam
     myMpu.GetYawPitchRoll(ypr, &q, &gravity);
     myMpu.ConvertToDegrees(ypr, xyz);
     //Serial.printfloatx(F("Yaw")  , xyz[0], 9, 4, F(",   "));
-    currentYaw = xyz[0];
+    if(xyz[0] < 0)
+        currentYaw = 360 + xyz[0];
+    else 
+        currentYaw = xyz[0];
     //Serial.printfloatx(F("Pitch"), xyz[1], 9, 4, F(",   "));
     //Serial.printfloatx(F("Roll") , xyz[2], 9, 4, F(",   "));
     //Serial.println();
@@ -51,27 +54,30 @@ void GyroscopeController::Init(){
 
 void GyroscopeController::Update(){
     myMpu.dmp_read_fifo();
+    //Serial.println(currentYaw);
 
-    if(targetYaw == 0 && currentYaw < 0)
-        acumulatedYaw += currentYaw;
-    else if(currentYaw < 0)
-        acumulatedYaw += (360 + currentYaw);
+    if(targetYaw % 360 == 0){
+        if(currentYaw > 180)
+            acumulatedYaw += (currentYaw - 360);
+        else     
+            acumulatedYaw += currentYaw;
+    }
     else 
         acumulatedYaw += currentYaw;
     numberOfSamples++;
     adverageYaw = acumulatedYaw / numberOfSamples;
-    //Serial.println(adverageYaw);
+    Serial.println(adverageYaw);
 }
 
 float GyroscopeController::GetCurrentYaw(){
-    if(currentYaw < 0)
-        return 360 + currentYaw;
-    else
-        return currentYaw;
+    return currentYaw;
 }
 
 float GyroscopeController::GetAdverageYaw(){
-    return adverageYaw;
+    if(adverageYaw < 0)
+        return 360 + adverageYaw;
+    else
+        return adverageYaw;
 }
 
 void GyroscopeController::ResetYaw(){

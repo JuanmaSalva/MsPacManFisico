@@ -8,44 +8,49 @@ MotorsController* motorsController;
 GyroscopeController* gyroscopeController;
 CommunicationManager* communicationManager;
 
+bool DEBUG = true;
+
 void setup() {
 	Serial.begin(9600);
 	Serial.println("Inicializamos");
 
-	communicationManager = new CommunicationManager();
-	communicationManager->Init();
-	communicationManager->Sync();
+	if(!DEBUG){
+		communicationManager = new CommunicationManager();
+		communicationManager->Init();
+		communicationManager->Sync();
+	}
 
 	lineTracker = new LineTracker();
 	lineTracker->Init();
-	communicationManager->SendMsg(LINE_TRACKER_INITIALIZED);
-	communicationManager->WaitApproval();
+	if(!DEBUG){
+		communicationManager->SendMsg(LINE_TRACKER_INITIALIZED);
+		communicationManager->WaitApproval();
+		}
 
 	gyroscopeController = new GyroscopeController();
 	gyroscopeController->Init();
-	communicationManager->SendMsg(GYROSCOPE_INITIALIZED);
-	communicationManager->WaitApproval();
+	if(!DEBUG){
+		communicationManager->SendMsg(GYROSCOPE_INITIALIZED);
+		communicationManager->WaitApproval();
+	}
 
 	motorsController = new MotorsController();
 	motorsController->Init();
 	motorsController->SetLineTracker(lineTracker);
 	motorsController->SetGyroscopeController(gyroscopeController);
-	communicationManager->SendMsg(MOTORS_INITIALIZES);
-	communicationManager->WaitApproval();
-
+	if(!DEBUG){
+		communicationManager->SendMsg(MOTORS_INITIALIZES);
+		communicationManager->WaitApproval();
 	Serial.println("\n\nEl server sabe que hemos terminado");
+	}
+
 }
 
 
 void loop() {
-	// if(communicationManager->Start()){
-	// 	lineTracker->Update();
-	// 	gyroscopeController->Update();
-	// 	motorsController->Update();
-	// 	//motorsController->Stright(true);
+	lineTracker->Update();
+	gyroscopeController->Update();
+	motorsController->Update();
 
-	// }
-	// Serial.println("Loop");
-	// communicationManager->Update();
-	
+	//communicationManager->Update();	
 }
