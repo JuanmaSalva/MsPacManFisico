@@ -2,6 +2,7 @@
 #include <BMI160Gen.h>
 
 Madgwick filter;
+unsigned long microsPerReading, microsPrevious;
 
 void setup() {
   Serial.begin(9600); // initialize Serial communication
@@ -16,41 +17,55 @@ void setup() {
   Serial.println(dev_id, HEX);
 
   // Set the accelerometer range to 250 degrees/second
-  BMI160.setGyroRange(250);
   BMI160.setGyroRate(25);
-  BMI160.setAccelerometerRange(2);
   BMI160.setAccelerometerRate(25);
-  Serial.println("Initializing IMU device...done.");
-
   filter.begin(25);
 
-  Serial.println("Curie Init");
+
+  
+  BMI160.setAccelerometerRange(2);
+  BMI160.setGyroRange(250);
+  Serial.println("Initializing IMU device...done.");
+
+  
+  microsPerReading = 1000000 / 25;
+  microsPrevious = micros();
 }
 
 void loop() {
-  int gxRaw, gyRaw, gzRaw;         // raw gyro values
-  int axRaw, ayRaw, azRaw;
+  
+  unsigned long microsNow;
+  microsNow = micros();
+  if (microsNow - microsPrevious >= microsPerReading) {
+      int gxRaw, gyRaw, gzRaw;         // raw gyro values
+      int axRaw, ayRaw, azRaw;
+    
+      float gx, gy, gz;
+      float ax, ay, az;
+    
+      // read raw gyro measurements from device
+      BMI160.readGyro(gxRaw, gyRaw, gzRaw);
+      BMI160.readAccelerometer(axRaw, ayRaw, azRaw);
+    
+      // convert the raw gyro data to degrees/second
+      gx = convertRawGyro(gxRaw);
+      gy = convertRawGyro(gyRaw);
+      gz = convertRawGyro(gzRaw);
+      ax = convertRawAcceleration(axRaw);
+      ay = convertRawAcceleration(ayRaw);
+      az = convertRawAcceleration(azRaw);
+    
+      filter.updateIMU(gx, gy, gz, 0, 0, 0);
+    
+      float yaw = filter.getYaw();
+    
+      Serial.println(yaw);
 
-  float gx, gy, gz;
-  float ax, ay, az;
+  
+    microsPrevious = microsPrevious + microsPerReading;
+  } 
+  
 
-  // read raw gyro measurements from device
-  BMI160.readGyro(gxRaw, gyRaw, gzRaw);
-  BMI160.readAccelerometer(axRaw, ayRaw, azRaw);
-
-  // convert the raw gyro data to degrees/second
-  gx = convertRawGyro(gxRaw);
-  gy = convertRawGyro(gyRaw);
-  gz = convertRawGyro(gzRaw);
-  ax = convertRawAcceleration(axRaw);
-  ay = convertRawAcceleration(ayRaw);
-  az = convertRawAcceleration(azRaw);
-
-  filter.updateIMU(gx, gy, gz, ax, ay, az);
-
-  float yaw = filter.getYaw();
-
-  Serial.println(yaw);
 
   //delay(250);
 }
