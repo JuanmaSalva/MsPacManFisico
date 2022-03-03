@@ -10,7 +10,7 @@
 #define INCREASED_SPEED 175
 
 #define TURNING_DEGREES_BUFFER 2.0
-#define MINIMUM_EXIT_TURN_TIME 200
+#define MINIMUM_EXIT_TURN_TIME 300
 
 enum State{
 	followingLine,
