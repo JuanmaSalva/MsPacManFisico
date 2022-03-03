@@ -175,21 +175,29 @@ TurningDirection MotorsController::OverCorrectionDirection(){
 }
 
 void MotorsController::TurnExit(){
-	if(IsInLine() && millis() - initialTime > MINIMUM_EXIT_TURN_TIME)
-	{
-		state = followingLine;
+	Stright(true);
+	
+	if(IsInLine()){
+		if(millis() - initialTime > MINIMUM_EXIT_TURN_TIME)
+		{
+			state = followingLine;
+			analogWrite(leftSpeed, NORMAL_SPEED);
+			analogWrite(rightSpeed, NORMAL_SPEED);  
+		}
+		else {
+			analogWrite(leftSpeed, INCREASED_SPEED);
+			analogWrite(rightSpeed, INCREASED_SPEED);  
+		}
 	} 
 	else{
 		TurningDirection overCorrectionDir = OverCorrectionDirection();
 
 		if(overCorrectionDir == right){ //corregimos a la derecha  
-			Stright(true);
 			analogWrite(leftSpeed, INCREASED_SPEED);
-			analogWrite(rightSpeed, REDUCED_SPEED);    
+			analogWrite(rightSpeed, NORMAL_SPEED);    
 		}
 		else if(overCorrectionDir == left){ //corregimos a la izquierda   
-			Stright(true);
-			analogWrite(leftSpeed, REDUCED_SPEED);
+			analogWrite(leftSpeed, NORMAL_SPEED);
 			analogWrite(rightSpeed, INCREASED_SPEED);  
 		}
 	}

@@ -2,11 +2,13 @@
 #include "MotorsController.h"
 #include "GyroscopeController.h"
 #include "CommunicationManager.h"
+#include "DirectionController.h"
 
 LineTracker* lineTracker;
 MotorsController* motorsController;
 GyroscopeController* gyroscopeController;
 CommunicationManager* communicationManager;
+DirectionController* directionController;
 
 bool DEBUG = true;
 
@@ -41,9 +43,13 @@ void setup() {
 	if(!DEBUG){
 		communicationManager->SendMsg(MOTORS_INITIALIZES);
 		communicationManager->WaitApproval();
-	Serial.println("\n\nEl server sabe que hemos terminado");
+		Serial.println("\n\nEl server sabe que hemos terminado");
 	}
 
+
+	directionController = new DirectionController();
+	directionController->SetMotorsController(motorsController);
+	communicationManager->SetDirectionController(directionController);
 }
 
 
@@ -52,5 +58,5 @@ void loop() {
 	gyroscopeController->Update();
 	motorsController->Update();
 
-	//communicationManager->Update();	
+	communicationManager->Update();	
 }

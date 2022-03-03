@@ -50,4 +50,14 @@ void CommunicationManager::WaitApproval(){
 
 
 void CommunicationManager::Update(){
+	/*if(miBT.available()){
+		MESSAGE msg = ReadMsg();
+		if(msg == OK){
+			return;
+		}
+	}*/
+}
+
+void CommunicationManager::SetDirectionController(DirectionController* d){
+	directionController = d;
 }
