@@ -16,19 +16,19 @@
 
 class GyroscopeController{
 private:
-    float adverageYaw;
-    float acumulatedYaw;
-    int numberOfSamples = 0;
-    int targetYaw = 0;
+	float adverageYaw;
+	float acumulatedYaw;
+	int numberOfSamples = 0;
+	int targetYaw = 0;
 
 public:
 
-    GyroscopeController();
+	GyroscopeController();
 
-    void Init();
-    void Update();
-    float GetCurrentYaw();
-    float GetAdverageYaw();
-    void ResetYaw();
-    void SetTargetYaw(int newTargetYaw);
+	void Init();
+	void Update();
+	float GetCurrentYaw();
+	float GetAdverageYaw();
+	void ResetYaw();
+	void SetTargetYaw(int newTargetYaw);
 };

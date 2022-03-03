@@ -1,5 +1,7 @@
 #include "MotorsController.h"
+#include "LineTracker.h"
 #include "GyroscopeController.h"
+#include "CommunicationManager.h"
 
 MotorsController::MotorsController(){
 	state = followingLine;
@@ -18,6 +20,7 @@ void MotorsController::Init(){
 	Stop();
 	//Stright(true);
 	//delay(50); //para empezar con velocidad
+
 }
 
 
@@ -44,6 +47,11 @@ void MotorsController::SetLineTracker(LineTracker* _lineTracker){
 
 void MotorsController::SetGyroscopeController(GyroscopeController* _gyroscopeController){
 	gyroscopeController = _gyroscopeController;
+}
+
+void MotorsController::SetCommunicationManager(CommunicationManager* _communicationManager){
+	communicationManager = _communicationManager;
+	communicationManager->SendMsg(MESSAGE::RED_LED);
 }
 
 void MotorsController::Stright(bool forwards){
@@ -188,7 +196,7 @@ void MotorsController::TurnExit(){
 			analogWrite(leftSpeed, INCREASED_SPEED);
 			analogWrite(rightSpeed, INCREASED_SPEED);  
 		}
-	} 
+	}
 	else{
 		TurningDirection overCorrectionDir = OverCorrectionDirection();
 

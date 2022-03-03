@@ -1,4 +1,5 @@
 #include "DirectionController.h"
+#include "MotorsController.h"
 
 DirectionController::DirectionController(){
 
@@ -6,5 +7,5 @@ DirectionController::DirectionController(){
 
 
 void DirectionController::SetMotorsController(MotorsController* m){
-    motorsController = m;
+	motorsController = m;
 }

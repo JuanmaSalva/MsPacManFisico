@@ -1,4 +1,5 @@
 #include "CommunicationManager.h"
+#include "DirectionController.h"
 
 CommunicationManager::CommunicationManager(): miBT(3,9)
 {

@@ -10,7 +10,7 @@ GyroscopeController* gyroscopeController;
 CommunicationManager* communicationManager;
 DirectionController* directionController;
 
-bool DEBUG = true;
+bool DEBUG = false;
 
 void setup() {
 	Serial.begin(9600);
@@ -41,15 +41,21 @@ void setup() {
 	motorsController->SetLineTracker(lineTracker);
 	motorsController->SetGyroscopeController(gyroscopeController);
 	if(!DEBUG){
-		communicationManager->SendMsg(MOTORS_INITIALIZES);
+		communicationManager->SendMsg(MOTORS_INITIALIZED);
 		communicationManager->WaitApproval();
-		Serial.println("\n\nEl server sabe que hemos terminado");
+		motorsController->SetCommunicationManager(communicationManager);
 	}
 
 
 	directionController = new DirectionController();
 	directionController->SetMotorsController(motorsController);
 	communicationManager->SetDirectionController(directionController);
+	if(!DEBUG){
+		communicationManager->SendMsg(DIRECCTION_INITIALIZED);
+		communicationManager->WaitApproval();
+	}
+
+	//Serial.println("\n\nEl server sabe que hemos terminado");
 }
 
 
@@ -58,5 +64,5 @@ void loop() {
 	gyroscopeController->Update();
 	motorsController->Update();
 
-	communicationManager->Update();	
+	//communicationManager->Update();	
 }

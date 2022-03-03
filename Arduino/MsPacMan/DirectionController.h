@@ -1,13 +1,15 @@
 #pragma once
-#include "MotorsController.h"
+#include "TurningDirecction.h"
+
+class MotorsController;
 
 class DirectionController{
 private:
-    MotorsController* motorsController;
-    TurningDirection turningDirections[];
+	MotorsController* motorsController;
+	TurningDirection turningDirections[];
 
 public:
-    DirectionController();
-    void SetMotorsController(MotorsController* m);
+	DirectionController();
+	void SetMotorsController(MotorsController* m);
 
 };

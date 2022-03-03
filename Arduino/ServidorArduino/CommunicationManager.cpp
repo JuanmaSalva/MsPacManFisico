@@ -42,7 +42,10 @@ void CommunicationManager::WaitForRobotToInitialize(){
 	WaitForMsg(GYROSCOPE_INITIALIZED);
 	Serial.println("Giroscopio Inicializados");
 	
-	WaitForMsg(MOTORS_INITIALIZES);
+	WaitForMsg(MOTORS_INITIALIZED);
+	Serial.println("Motores Inicializados");
+
+	WaitForMsg(DIRECCTION_INITIALIZED);
 	Serial.println("Motores Inicializados");
 }
 
@@ -50,12 +53,16 @@ void CommunicationManager::WaitForMsg(MESSAGE msg){
 	while (true)
 	{
 		if(miBT.available()){
-			MESSAGE msg = ReadMsg();
-			if(msg == msg){
+			MESSAGE msgAux = ReadMsg();
+			if(msgAux == msg){
 				SendMsg(OK);
 				break;
 			}
 		}
 		delay(5);
 	}
+}
+
+bool CommunicationManager::MsgAvailable(){
+	return miBT.available();
 }

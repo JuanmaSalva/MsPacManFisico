@@ -1,16 +1,25 @@
 #pragma once
 #include <Arduino.h>
 #include <SoftwareSerial.h>
-#include "DirectionController.h"
 
+class DirectionController;
 
 enum MESSAGE{
 	SYNC_ATTEMP,
 	SYNC,
 	LINE_TRACKER_INITIALIZED,
 	GYROSCOPE_INITIALIZED,
-	MOTORS_INITIALIZES,
+	MOTORS_INITIALIZED,
+	DIRECCTION_INITIALIZED,
 
+
+	RED_LED,
+	GREEN_LED,
+	BLUE_LED,
+	YELLOW_LED,
+	CIAN_LED,
+	MAGENTA_LED,
+	WHITE_LED,
 	OK
 };
 

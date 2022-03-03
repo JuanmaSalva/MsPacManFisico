@@ -3,14 +3,14 @@
 
 
 enum JAVA_MESSAGE{
-    JAVA_SYNC_ATTEMP = 0,
-    JAVA_SYNC = 1,
-    PAC_MAN_UP,
-    PAC_MAN_RIGHT,
-    PAC_MAN_DOWN,
-    PAC_MAN_LEFT,
+	JAVA_SYNC_ATTEMP = 0,
+	JAVA_SYNC = 1,
+	PAC_MAN_UP,
+	PAC_MAN_RIGHT,
+	PAC_MAN_DOWN,
+	PAC_MAN_LEFT,
 
-    JAVA_OK
+	JAVA_OK
 };
 
 
@@ -19,10 +19,10 @@ private:
 
 
 public:
-    ServerManager();
+	ServerManager();
 
-    void SyncToJava();
+	void SyncToJava();
 
-    void SendMsg(JAVA_MESSAGE msg);
-    JAVA_MESSAGE ReadMsg();
+	void SendMsg(JAVA_MESSAGE msg);
+	JAVA_MESSAGE ReadMsg();
 };

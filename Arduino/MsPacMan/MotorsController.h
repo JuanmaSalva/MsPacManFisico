@@ -1,9 +1,10 @@
 #pragma once
 #include <Arduino.h>
+#include "TurningDirecction.h"
 
-#include "LineTracker.h"
-#include "GyroscopeController.h"
-
+class LineTracker;
+class GyroscopeController;
+class CommunicationManager;
 
 #define NORMAL_SPEED 150
 #define REDUCED_SPEED 95
@@ -18,11 +19,6 @@ enum State{
 	turnExit
 };
 
-enum TurningDirection{
-	left,
-	right,
-	none
-};
 
 class MotorsController{
 private:
@@ -35,6 +31,7 @@ private:
 
 	LineTracker* lineTracker;
 	GyroscopeController* gyroscopeController;
+	CommunicationManager* communicationManager = nullptr;
 
 	State state;
 	float initialTurningYaw;
@@ -63,4 +60,5 @@ public:
 
 	void SetLineTracker(LineTracker* _lineTracker);
 	void SetGyroscopeController(GyroscopeController* _gyroscopeController);
+	void SetCommunicationManager(CommunicationManager* _communicationManager);
 };
