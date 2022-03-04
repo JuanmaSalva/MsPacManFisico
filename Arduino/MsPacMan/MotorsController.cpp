@@ -51,7 +51,6 @@ void MotorsController::SetGyroscopeController(GyroscopeController* _gyroscopeCon
 
 void MotorsController::SetCommunicationManager(CommunicationManager* _communicationManager){
 	communicationManager = _communicationManager;
-	communicationManager->SendMsg(MESSAGE::RED_LED);
 }
 
 void MotorsController::Stright(bool forwards){
@@ -67,9 +66,6 @@ void MotorsController::Stright(bool forwards){
 		digitalWrite(forwardRight, LOW);
 		digitalWrite(backwardRight, HIGH);
 	}
-	
-	digitalWrite(rightSpeed, REDUCED_SPEED);
-	digitalWrite(leftSpeed, REDUCED_SPEED);
 }
 
 void MotorsController::Stop(){
@@ -79,12 +75,18 @@ void MotorsController::Stop(){
 	digitalWrite(backwardLeft, LOW);
 }
 
+
 void MotorsController::NinetyGegreeTurn(){
-	Stright(false);
+	communicationManager->SendMsg(MESSAGE::RED_LED);
+	Stright(false);	
+	digitalWrite(rightSpeed, NORMAL_SPEED);
+	digitalWrite(leftSpeed, NORMAL_SPEED);
 	delay(75);
 	Stop();
 	delay(100);
+
 	state = turning;
+	communicationManager->SendMsg(MESSAGE::BLUE_LED);
 	initialTurningYaw = gyroscopeController->GetAdverageYaw();
 	perfectAngle += 270;
 	gyroscopeController->SetTargetYaw(perfectAngle);
@@ -111,8 +113,6 @@ void MotorsController::Turn(){
 		digitalWrite(backwardRight, LOW);
 	}
 }
-
-
 
 
 
@@ -153,7 +153,9 @@ void MotorsController::Turning(){
 
 		Stop();
 		delay(100);
-		Stright(true);
+		Stright(true);	
+		digitalWrite(rightSpeed, NORMAL_SPEED);
+		digitalWrite(leftSpeed, NORMAL_SPEED);
 		state = turnExit;
 		initialTime = millis();
 		gyroscopeController->ResetYaw();
@@ -188,11 +190,14 @@ void MotorsController::TurnExit(){
 	if(IsInLine()){
 		if(millis() - initialTime > MINIMUM_EXIT_TURN_TIME)
 		{
+			communicationManager->SendMsg(MESSAGE::GREEN_LED);
 			state = followingLine;
 			analogWrite(leftSpeed, NORMAL_SPEED);
 			analogWrite(rightSpeed, NORMAL_SPEED);  
 		}
 		else {
+			//Si esta en linea pero aun no ha pasado suficiente tiempo mínimo, se
+			//acelera más rápido para recuperar la velocidad de cricero 
 			analogWrite(leftSpeed, INCREASED_SPEED);
 			analogWrite(rightSpeed, INCREASED_SPEED);  
 		}
@@ -202,10 +207,10 @@ void MotorsController::TurnExit(){
 
 		if(overCorrectionDir == right){ //corregimos a la derecha  
 			analogWrite(leftSpeed, INCREASED_SPEED);
-			analogWrite(rightSpeed, NORMAL_SPEED);    
+			analogWrite(rightSpeed, REDUCED_SPEED/2);    
 		}
 		else if(overCorrectionDir == left){ //corregimos a la izquierda   
-			analogWrite(leftSpeed, NORMAL_SPEED);
+			analogWrite(leftSpeed, REDUCED_SPEED/2);
 			analogWrite(rightSpeed, INCREASED_SPEED);  
 		}
 	}

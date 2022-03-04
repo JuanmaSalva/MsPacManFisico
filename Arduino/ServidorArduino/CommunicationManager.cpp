@@ -46,7 +46,7 @@ void CommunicationManager::WaitForRobotToInitialize(){
 	Serial.println("Motores Inicializados");
 
 	WaitForMsg(DIRECCTION_INITIALIZED);
-	Serial.println("Motores Inicializados");
+	Serial.println("Dirección Inicializada");
 }
 
 void CommunicationManager::WaitForMsg(MESSAGE msg){

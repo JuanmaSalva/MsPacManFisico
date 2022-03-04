@@ -99,6 +99,11 @@ void DebugLed(){
 			analogWrite(green, 255);
 			analogWrite(blue, 255);			
 		}
+		else if(msg == GREEN_LED){
+			analogWrite(red, 0);
+			analogWrite(green, 255);
+			analogWrite(blue, 0);
+		}
 	}
 }
 

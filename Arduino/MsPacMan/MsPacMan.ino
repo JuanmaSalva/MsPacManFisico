@@ -49,10 +49,11 @@ void setup() {
 
 	directionController = new DirectionController();
 	directionController->SetMotorsController(motorsController);
-	communicationManager->SetDirectionController(directionController);
 	if(!DEBUG){
+		communicationManager->SetDirectionController(directionController);
 		communicationManager->SendMsg(DIRECCTION_INITIALIZED);
 		communicationManager->WaitApproval();
+		communicationManager->SendMsg(MESSAGE::GREEN_LED);
 	}
 
 	//Serial.println("\n\nEl server sabe que hemos terminado");
@@ -64,5 +65,5 @@ void loop() {
 	gyroscopeController->Update();
 	motorsController->Update();
 
-	//communicationManager->Update();	
+	communicationManager->Update();	
 }

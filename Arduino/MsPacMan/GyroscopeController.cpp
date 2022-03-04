@@ -54,7 +54,7 @@ void GyroscopeController::Init(){
 
 void GyroscopeController::Update(){
 	myMpu.dmp_read_fifo();
-	//Serial.println(currentYaw);
+	Serial.println(currentYaw);
 
 	if(targetYaw % 360 == 0){
 		if(currentYaw > 180)
@@ -66,7 +66,7 @@ void GyroscopeController::Update(){
 		acumulatedYaw += currentYaw;
 	numberOfSamples++;
 	adverageYaw = acumulatedYaw / numberOfSamples;
-	Serial.println(adverageYaw);
+	//Serial.println(adverageYaw);
 }
 
 float GyroscopeController::GetCurrentYaw(){
