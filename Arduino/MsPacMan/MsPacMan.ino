@@ -2,50 +2,72 @@
 #include "MotorsController.h"
 #include "GyroscopeController.h"
 #include "CommunicationManager.h"
+#include "DirectionController.h"
 
 LineTracker* lineTracker;
 MotorsController* motorsController;
 GyroscopeController* gyroscopeController;
 CommunicationManager* communicationManager;
+DirectionController* directionController;
+
+bool DEBUG = false;
 
 void setup() {
 	Serial.begin(9600);
 	Serial.println("Inicializamos");
 
-	communicationManager = new CommunicationManager();
-	communicationManager->Init();
-	communicationManager->Sync();
+	//Communication Manager
+	if(!DEBUG){
+		communicationManager = new CommunicationManager();
+		communicationManager->Init();
+		communicationManager->Sync();
+	}
 
+	//Line tracker
 	lineTracker = new LineTracker();
 	lineTracker->Init();
-	communicationManager->SendMsg(LINE_TRACKER_INITIALIZED);
-	communicationManager->WaitApproval();
+	if(!DEBUG){
+		communicationManager->SendMsg(LINE_TRACKER_INITIALIZED);
+		communicationManager->WaitApproval();
+	}
 
+	//Gyroscope Controller
 	gyroscopeController = new GyroscopeController();
 	gyroscopeController->Init();
-	communicationManager->SendMsg(GYROSCOPE_INITIALIZED);
-	communicationManager->WaitApproval();
+	if(!DEBUG){
+		communicationManager->SendMsg(GYROSCOPE_INITIALIZED);
+		communicationManager->WaitApproval();
+	}
 
+	//Motors Controller
 	motorsController = new MotorsController();
 	motorsController->Init();
 	motorsController->SetLineTracker(lineTracker);
 	motorsController->SetGyroscopeController(gyroscopeController);
-	communicationManager->SendMsg(MOTORS_INITIALIZES);
-	communicationManager->WaitApproval();
+	if(!DEBUG){
+		communicationManager->SendMsg(MOTORS_INITIALIZED);
+		communicationManager->WaitApproval();
+		motorsController->SetCommunicationManager(communicationManager);
+	}
 
-	Serial.println("\n\nEl server sabe que hemos terminado");
+	//Direccion Controller
+	directionController = new DirectionController();
+	directionController->SetMotorsController(motorsController);
+
+
+	if(!DEBUG){
+		communicationManager->SetDirectionController(directionController);
+		communicationManager->SendMsg(DIRECCTION_INITIALIZED);
+		communicationManager->WaitApproval();
+		communicationManager->SendMsg(MESSAGE::GREEN_LED);
+	}
 }
 
 
 void loop() {
-	// if(communicationManager->Start()){
-	// 	lineTracker->Update();
-	// 	gyroscopeController->Update();
-	// 	motorsController->Update();
-	// 	//motorsController->Stright(true);
+	lineTracker->Update();
+	gyroscopeController->Update();
+	motorsController->Update();
 
-	// }
-	// Serial.println("Loop");
-	// communicationManager->Update();
-	
+	communicationManager->Update();	
 }
