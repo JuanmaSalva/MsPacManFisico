@@ -3,6 +3,14 @@
 Simple_MPU6050 myMpu;
 float currentYaw;
 
+/**
+ * @brief Saca y calcula los datos del giroescopio
+ * 
+ * @param gyro valores del giroescopio
+ * @param accel valores del acelerómetro
+ * @param quat valor del quaternion actual
+ * @param timestamp tiempo desde la última toma de datos
+ */
 void ShowValues(int16_t *gyro, int16_t *accel, int32_t *quat, uint32_t *timestamp){
 	Quaternion q;
 	VectorFloat gravity;
@@ -26,6 +34,10 @@ GyroscopeController::GyroscopeController(){
 	acumulatedYaw = 0;
 }
 
+/**
+ * @brief Inicializa y calibra el giroescopio
+ * Este proceso puede durar unos segundos
+ */
 void GyroscopeController::Init(){
 	uint8_t val;
 #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE  // activacion de bus I2C a 400 Khz
@@ -51,6 +63,7 @@ void GyroscopeController::Init(){
 	myMpu.on_FIFO(ShowValues);   // llamado a funcion mostrar_valores si memoria FIFO tiene valores
 	
 }
+
 
 void GyroscopeController::Update(){
 	myMpu.dmp_read_fifo();
@@ -80,6 +93,9 @@ float GyroscopeController::GetAdverageYaw(){
 		return adverageYaw;
 }
 
+/**
+ * @brief Resetea el Yaw promedio 
+ */
 void GyroscopeController::ResetYaw(){
 	numberOfSamples = 0;
 	acumulatedYaw = 0;

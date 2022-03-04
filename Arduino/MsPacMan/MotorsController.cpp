@@ -53,6 +53,11 @@ void MotorsController::SetCommunicationManager(CommunicationManager* _communicat
 	communicationManager = _communicationManager;
 }
 
+/**
+ * @brief Establece los motores para ir en linea recta
+ * 
+ * @param forwards true si se quiere de frente, false en caso de querer ir marcha atrás
+ */
 void MotorsController::Stright(bool forwards){
 	if(forwards){
 		digitalWrite(forwardLeft, LOW);
@@ -68,6 +73,9 @@ void MotorsController::Stright(bool forwards){
 	}
 }
 
+/**
+ * @brief Para los motores 
+ */
 void MotorsController::Stop(){
 	digitalWrite(forwardRight, LOW);
 	digitalWrite(backwardRight, LOW);
@@ -76,6 +84,9 @@ void MotorsController::Stop(){
 }
 
 
+/**
+ * @brief Empieza a realizar un giro de 90 grados
+ */
 void MotorsController::NinetyGegreeTurn(){
 	communicationManager->SendMsg(MESSAGE::RED_LED);
 	Stright(false);	
@@ -93,6 +104,9 @@ void MotorsController::NinetyGegreeTurn(){
 	Turn();
 }
 
+/**
+ * @brief Establece los motores en direcciones inversas para realizar un giro
+ */
 void MotorsController::Turn(){
 	if(turningDirection == right){
 		analogWrite(leftSpeed, NORMAL_SPEED);
@@ -116,7 +130,11 @@ void MotorsController::Turn(){
 
 
 
-
+/**
+ * @brief Método encargado de dirigir el robot cuando se va en linea recta.
+ * Se encarga de leer la acción que tiene que realizar dada por el lineTracker.
+ * Encargado de detectar cuando se tiene que empezar a girar.
+ */
 void MotorsController::FollowLine(){
 	Action currentAction = lineTracker->GetCurrentAction();
  
@@ -144,6 +162,9 @@ void MotorsController::FollowLine(){
 	}
 }
 
+/**
+ * @brief Controla el giro, encargado de pararlo cuando es necesario 
+ */
 void MotorsController::Turning(){
 	if(abs((perfectAngle % 360) - gyroscopeController->GetCurrentYaw()) < TURNING_DEGREES_BUFFER){
 		turningDirection = (turningDirection == right) ? left: right;
@@ -162,6 +183,13 @@ void MotorsController::Turning(){
 	}
 }
 
+
+/**
+ * @brief Revisa si el robor está orientado en la dirección correcta
+ * 
+ * @return true si está bien orientado
+ * @return false si no está bien orientado
+ */
 bool MotorsController::IsInLine(){
 	int angleModule = perfectAngle % 360;
 
@@ -176,6 +204,11 @@ bool MotorsController::IsInLine(){
 		return (abs(angleModule - gyroscopeController->GetCurrentYaw()) < TURNING_DEGREES_BUFFER);	
 }
 
+
+/**
+ * @brief Devuelve la dirección hacia la que el robot tiene que sobre-corregir tras realizar un giro de 90 grados * 
+ * @return Dirección hacia la que se tiene que corregir 
+ */
 TurningDirection MotorsController::OverCorrectionDirection(){
 	float aux = gyroscopeController->GetCurrentYaw(); 
 	if(aux < (perfectAngle % 360))
@@ -184,6 +217,11 @@ TurningDirection MotorsController::OverCorrectionDirection(){
 		return left;
 }
 
+
+/**
+ * @brief Encargado de dirigir el robot los instantes posteriores a un giro
+ * Encargado tambien de sobrecorregirlo para salir en la dirección correcta
+ */
 void MotorsController::TurnExit(){
 	Stright(true);
 	

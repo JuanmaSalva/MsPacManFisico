@@ -34,6 +34,11 @@ void LineTracker::Update(){
 		currentAction = lost;
 }
 
+/**
+ * @brief Devuelve la acción que debería hacer el robot en un determinado instante
+ * 
+ * @return Acción 
+ */
 Action LineTracker::GetCurrentAction(){
 	return currentAction;
 }

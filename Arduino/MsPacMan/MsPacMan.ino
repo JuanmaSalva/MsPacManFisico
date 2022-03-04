@@ -16,19 +16,22 @@ void setup() {
 	Serial.begin(9600);
 	Serial.println("Inicializamos");
 
+	//Communication Manager
 	if(!DEBUG){
 		communicationManager = new CommunicationManager();
 		communicationManager->Init();
 		communicationManager->Sync();
 	}
 
+	//Line tracker
 	lineTracker = new LineTracker();
 	lineTracker->Init();
 	if(!DEBUG){
 		communicationManager->SendMsg(LINE_TRACKER_INITIALIZED);
 		communicationManager->WaitApproval();
-		}
+	}
 
+	//Gyroscope Controller
 	gyroscopeController = new GyroscopeController();
 	gyroscopeController->Init();
 	if(!DEBUG){
@@ -36,6 +39,7 @@ void setup() {
 		communicationManager->WaitApproval();
 	}
 
+	//Motors Controller
 	motorsController = new MotorsController();
 	motorsController->Init();
 	motorsController->SetLineTracker(lineTracker);
@@ -46,17 +50,17 @@ void setup() {
 		motorsController->SetCommunicationManager(communicationManager);
 	}
 
-
+	//Direccion Controller
 	directionController = new DirectionController();
 	directionController->SetMotorsController(motorsController);
+
+
 	if(!DEBUG){
 		communicationManager->SetDirectionController(directionController);
 		communicationManager->SendMsg(DIRECCTION_INITIALIZED);
 		communicationManager->WaitApproval();
 		communicationManager->SendMsg(MESSAGE::GREEN_LED);
 	}
-
-	//Serial.println("\n\nEl server sabe que hemos terminado");
 }
 
 
