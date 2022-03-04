@@ -4,6 +4,7 @@
 CommunicationManager* communicationManager;
 ServerManager* serverManager;
 
+//pines para la led rgb
 int red = 9;
 int green = 10;
 int blue = 11;
@@ -29,6 +30,7 @@ void setup() {
 	analogWrite(green, 0);
 	analogWrite(blue, 255);
 
+	//inicialización y sincronización de la comunicación con el robot
 	communicationManager = new CommunicationManager();
 	communicationManager->Init();
 	communicationManager->Sync();
@@ -64,6 +66,9 @@ void Java(){
 	}
 }
 
+/**
+ * @brief Procesamiento de los mensajes de debug 
+ **/
 void DebugLed(){
 	if(communicationManager->MsgAvailable()){
 		Serial.println("Mensaje Recibido");
