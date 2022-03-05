@@ -21,17 +21,17 @@ void LineTracker::Update(){
 	// Serial.print(" ");
 	// Serial.println(right);
 	if(_left == LINE && _center == CORRIDOR && _right == LINE) //recto
-		currentAction = straight;
+		currentAction = Action::straight;
 	else if (_left == CORRIDOR && _right == LINE)  //desvio derecha
-		currentAction = leftCorrection;
+		currentAction = Action::leftCorrection;
 	else if(_left == LINE && _right == CORRIDOR) //desvio izquierda
-		currentAction = rightCorrection;      
+		currentAction = Action::rightCorrection;      
 	else if(_left == LINE && _center == LINE && _right == LINE) //TODO de momento provisional
 	{
-		currentAction = leftTurn;
+		currentAction = Action::turn;
 	}   
 	else
-		currentAction = lost;
+		currentAction = Action::lost;
 }
 
 /**

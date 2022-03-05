@@ -1,15 +1,15 @@
 #pragma once
 #include "TurningDirecction.h"
 
-class MotorsController;
-
 class DirectionController{
 private:
-	MotorsController* motorsController;
-	TurningDirection turningDirections[];
+	TurningDirection turningDirections[5] = {TurningDirection::left, TurningDirection::none, 
+												TurningDirection::left, TurningDirection::left,
+														 TurningDirection::left};
+	int currentInstruction;
 
 public:
 	DirectionController();
-	void SetMotorsController(MotorsController* m);
 
+	TurningDirection GetNextDirection();
 };

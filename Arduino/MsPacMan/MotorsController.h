@@ -5,6 +5,7 @@
 class LineTracker;
 class GyroscopeController;
 class CommunicationManager;
+class DirectionController;
 
 #define NORMAL_SPEED 150
 #define REDUCED_SPEED 95
@@ -32,10 +33,12 @@ private:
 	LineTracker* lineTracker;
 	GyroscopeController* gyroscopeController;
 	CommunicationManager* communicationManager = nullptr;
+	DirectionController* directionController;
 
 	State state;
 	float initialTurningYaw;
 	TurningDirection turningDirection;
+	TurningDirection nextDirection = TurningDirection::none;
 	long initialTime;
 	int perfectAngle; //el ángluo que deberia llevar el robot en relacion a la posicion de inicio
 
@@ -61,4 +64,5 @@ public:
 	void SetLineTracker(LineTracker* _lineTracker);
 	void SetGyroscopeController(GyroscopeController* _gyroscopeController);
 	void SetCommunicationManager(CommunicationManager* _communicationManager);
+	void SetDirectionController(DirectionController* _directionController);
 };
