@@ -138,10 +138,10 @@ void MotorsController::TurnExit(){
 
 		if(overCorrectionDir == right){ //corregimos a la derecha  
 			analogWrite(leftSpeed, INCREASED_SPEED);
-			analogWrite(rightSpeed, REDUCED_SPEED/2);    
+			analogWrite(rightSpeed, REDUCED_SPEED);    
 		}
 		else if(overCorrectionDir == left){ //corregimos a la izquierda   
-			analogWrite(leftSpeed, REDUCED_SPEED/2);
+			analogWrite(leftSpeed, REDUCED_SPEED);
 			analogWrite(rightSpeed, INCREASED_SPEED);  
 		}
 	}
