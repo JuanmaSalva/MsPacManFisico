@@ -17,7 +17,8 @@ class DirectionController;
 enum State{
 	followingLine,
 	turning,
-	turnExit
+	turnExit,
+	followGyroscope
 };
 
 
@@ -48,6 +49,7 @@ private:
 	void FollowLine();
 	void Turning();
 	void TurnExit();
+	void FollowGyroscope();
 	
 	void Turn();
 	bool IsInLine();

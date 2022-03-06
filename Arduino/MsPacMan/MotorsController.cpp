@@ -37,6 +37,9 @@ void MotorsController::Update(){
 	case turnExit:
 		TurnExit();
 		break;
+	case followGyroscope:
+		FollowGyroscope();
+		break;
 	default:
 		break;
 	}
@@ -70,7 +73,8 @@ void MotorsController::FollowLine(){
 			Stright(true);	
 			analogWrite(leftSpeed, NORMAL_SPEED);
 			analogWrite(rightSpeed, NORMAL_SPEED);
-			delay(MINIMUM_EXIT_TURN_TIME);
+			state = followGyroscope;
+			initialTime = millis();
 			//TODO mientras estamos en este estado, tenemos que seguir la trayectoria perfecta
 		}
 	}
@@ -147,6 +151,34 @@ void MotorsController::TurnExit(){
 	}
 }
 
+/**
+ * @brief Encargado de dirigir el robot guiandose únicamente por los datos 
+ * recibidos por el giroscopio 
+ */
+void MotorsController::FollowGyroscope(){
+	TurningDirection overCorrectionDir = OverCorrectionDirection();
+
+	if(overCorrectionDir == left){
+		analogWrite(leftSpeed, REDUCED_SPEED);
+		analogWrite(rightSpeed, INCREASED_SPEED);
+	}
+	else if (overCorrectionDir == right){
+		analogWrite(leftSpeed, INCREASED_SPEED);
+		analogWrite(rightSpeed, REDUCED_SPEED);
+	}
+	else { //no deberia de llegar aquí nunca
+		analogWrite(leftSpeed, NORMAL_SPEED);
+		analogWrite(rightSpeed, NORMAL_SPEED);
+	}
+
+	//hemos salido de la zona de la interseccion (zona negra) y los sensores ya detectan
+	//los carriles. Ya se puede volver al control normal
+	if(lineTracker->GetCurrentAction() == Action::straight || 
+	millis() - initialTime > MINIMUM_EXIT_TURN_TIME){
+		state = followingLine;
+		communicationManager->SendMsg(MESSAGE::GREEN_LED);
+	}
+}
 
 
 /**
