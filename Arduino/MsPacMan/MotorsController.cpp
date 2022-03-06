@@ -53,11 +53,18 @@ void MotorsController::Update(){
  */
 void MotorsController::FollowLine(){
 	Action currentAction = lineTracker->GetCurrentAction();
- 
-	if(currentAction == Action::straight){ //recto
+	
+	if(currentAction == Action::straight){ //recto		
 		Stright(true);
-		analogWrite(leftSpeed, NORMAL_SPEED);
-		analogWrite(rightSpeed, NORMAL_SPEED);
+
+		if(CurrentDirectionOffset() > STRIGHT_DEGREES_BUFFER){
+			TurningDirection overCorrectionDir = OverCorrectionDirection();
+			AplyOverCorrection(overCorrectionDir);		
+		}
+		else {
+			analogWrite(leftSpeed, NORMAL_SPEED);
+			analogWrite(rightSpeed, NORMAL_SPEED);
+		}
 	}
 	else if(currentAction == turn){ //Giro 90 grados
 		if(nextDirection == TurningDirection::left){
@@ -121,7 +128,7 @@ void MotorsController::Turning(){
 void MotorsController::TurnExit(){
 	Stright(true);
 	
-	if(IsInLine()){
+	if(CurrentDirectionOffset() < TURNING_DEGREES_BUFFER){ //si está alineado
 		if(millis() - initialTime > MINIMUM_EXIT_TURN_TIME)
 		{
 			communicationManager->SendMsg(MESSAGE::GREEN_LED);
@@ -139,15 +146,7 @@ void MotorsController::TurnExit(){
 	}
 	else{
 		TurningDirection overCorrectionDir = OverCorrectionDirection();
-
-		if(overCorrectionDir == right){ //corregimos a la derecha  
-			analogWrite(leftSpeed, INCREASED_SPEED);
-			analogWrite(rightSpeed, REDUCED_SPEED);    
-		}
-		else if(overCorrectionDir == left){ //corregimos a la izquierda   
-			analogWrite(leftSpeed, REDUCED_SPEED);
-			analogWrite(rightSpeed, INCREASED_SPEED);  
-		}
+		AplyOverCorrection(overCorrectionDir);
 	}
 }
 
@@ -157,19 +156,7 @@ void MotorsController::TurnExit(){
  */
 void MotorsController::FollowGyroscope(){
 	TurningDirection overCorrectionDir = OverCorrectionDirection();
-
-	if(overCorrectionDir == left){
-		analogWrite(leftSpeed, REDUCED_SPEED);
-		analogWrite(rightSpeed, INCREASED_SPEED);
-	}
-	else if (overCorrectionDir == right){
-		analogWrite(leftSpeed, INCREASED_SPEED);
-		analogWrite(rightSpeed, REDUCED_SPEED);
-	}
-	else { //no deberia de llegar aquí nunca
-		analogWrite(leftSpeed, NORMAL_SPEED);
-		analogWrite(rightSpeed, NORMAL_SPEED);
-	}
+	AplyOverCorrection(overCorrectionDir);
 
 	//hemos salido de la zona de la interseccion (zona negra) y los sensores ya detectan
 	//los carriles. Ya se puede volver al control normal
@@ -268,26 +255,26 @@ void MotorsController::Turn(){
 
 
 
+
+
+
 /**
- * @brief Revisa si el robor está orientado en la dirección correcta
- * 
- * @return true si está bien orientado
- * @return false si no está bien orientado
+ * @brief Devuelve en grados positivos, la desviacion de la trayectorio del robot
+ * en un determinado instante respecto la direccion que debería tener (perfectAngle) 
+ * @return desviacion en grados positivos
  */
-bool MotorsController::IsInLine(){
+float MotorsController::CurrentDirectionOffset(){
 	int angleModule = perfectAngle % 360;
 
 	if(angleModule == 0){
-		if(gyroscopeController->GetCurrentYaw() < TURNING_DEGREES_BUFFER ||
-		gyroscopeController->GetCurrentYaw() > 360 - TURNING_DEGREES_BUFFER)
-			return true;
-		else 
-			return false;
+		if(gyroscopeController->GetCurrentYaw() < 180)
+			return gyroscopeController->GetCurrentYaw();
+		else
+			return 360 - gyroscopeController->GetCurrentYaw();
 	}
 	else
-		return (abs(angleModule - gyroscopeController->GetCurrentYaw()) < TURNING_DEGREES_BUFFER);	
+		return abs(angleModule - gyroscopeController->GetCurrentYaw());	
 }
-
 
 /**
  * @brief Devuelve la dirección hacia la que el robot tiene que sobre-corregir tras realizar un giro de 90 grados * 
@@ -302,6 +289,25 @@ TurningDirection MotorsController::OverCorrectionDirection(){
 }
 
 
+/**
+ * @brief Cambia las velocidades de los motores para realizar la sobrecorrección necesaria
+ * 
+ * @param dir dirección a la que tenemos que sobrecorregir
+ */
+void MotorsController::AplyOverCorrection(TurningDirection dir){
+	if(dir == left){
+		analogWrite(leftSpeed, REDUCED_SPEED);
+		analogWrite(rightSpeed, INCREASED_SPEED);
+	}
+	else if (dir == right){
+		analogWrite(leftSpeed, INCREASED_SPEED);
+		analogWrite(rightSpeed, REDUCED_SPEED);
+	}
+	else { //no deberia de llegar aquí nunca
+		analogWrite(leftSpeed, NORMAL_SPEED);
+		analogWrite(rightSpeed, NORMAL_SPEED);
+	}
+}
 
 
 void MotorsController::SetLineTracker(LineTracker* _lineTracker){

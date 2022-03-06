@@ -11,7 +11,8 @@ class DirectionController;
 #define REDUCED_SPEED 70
 #define INCREASED_SPEED 180
 
-#define TURNING_DEGREES_BUFFER 2.0
+#define TURNING_DEGREES_BUFFER 1.5
+#define STRIGHT_DEGREES_BUFFER 7.5
 #define MINIMUM_EXIT_TURN_TIME 250
 
 enum State{
@@ -52,8 +53,9 @@ private:
 	void FollowGyroscope();
 	
 	void Turn();
-	bool IsInLine();
 	TurningDirection OverCorrectionDirection();
+	void AplyOverCorrection(TurningDirection dir);
+	float CurrentDirectionOffset();
 
 public:
 	void Stright(bool forwards); //Provisional para probar el bletooh, volver a provado luego
