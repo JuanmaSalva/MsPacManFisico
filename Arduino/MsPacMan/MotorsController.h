@@ -13,13 +13,14 @@ class DirectionController;
 
 #define TURNING_DEGREES_BUFFER 1.5
 #define STRIGHT_DEGREES_BUFFER 7.5
-#define MINIMUM_EXIT_TURN_TIME 250
+#define MINIMUM_EXIT_TURN_TIME 300
 
 enum State{
 	followingLine,
 	turning,
 	turnExit,
-	followGyroscope
+	followGyroscope,
+	braking
 };
 
 
@@ -51,6 +52,7 @@ private:
 	void Turning();
 	void TurnExit();
 	void FollowGyroscope();
+	void Braking();
 	
 	void Turn();
 	TurningDirection OverCorrectionDirection();

@@ -40,6 +40,9 @@ void MotorsController::Update(){
 	case followGyroscope:
 		FollowGyroscope();
 		break;
+	case braking:
+		Braking();
+		break;
 	default:
 		break;
 	}
@@ -87,13 +90,27 @@ void MotorsController::FollowLine(){
 	}
 	else if (currentAction == leftCorrection) { //desvio derecha
 		Stright(true);
-		analogWrite(leftSpeed, REDUCED_SPEED);
-		analogWrite(rightSpeed, INCREASED_SPEED);
+
+		if(CurrentDirectionOffset() > STRIGHT_DEGREES_BUFFER){
+			analogWrite(leftSpeed, (int)(REDUCED_SPEED * 0.8f));
+			analogWrite(rightSpeed, (int)(INCREASED_SPEED * 1.2f));
+		}
+		else {
+			analogWrite(leftSpeed, REDUCED_SPEED);
+			analogWrite(rightSpeed, INCREASED_SPEED);
+		}
 	}
 	else if(currentAction == rightCorrection){ //desvio izquierda
 		Stright(true);
-		analogWrite(leftSpeed, INCREASED_SPEED);
-		analogWrite(rightSpeed, REDUCED_SPEED);
+
+		if(CurrentDirectionOffset() > STRIGHT_DEGREES_BUFFER){
+			analogWrite(leftSpeed, (int)(INCREASED_SPEED * 1.2f));
+			analogWrite(rightSpeed, (int)(REDUCED_SPEED * 0.8f));
+		}
+		else {
+			analogWrite(leftSpeed, INCREASED_SPEED);
+			analogWrite(rightSpeed, REDUCED_SPEED);
+		}
 	}
 	else if (currentAction == lost){ //parada
 		Stop();
@@ -190,6 +207,33 @@ void MotorsController::Stright(bool forwards){
 
 
 
+void MotorsController::Braking(){
+	Action currentAction = lineTracker->GetCurrentAction();
+
+	if(currentAction == Action::straight){
+		Stright(false);	
+		digitalWrite(rightSpeed, NORMAL_SPEED);
+		digitalWrite(leftSpeed, NORMAL_SPEED);
+		delay(100);
+		Stop();
+		delay(100);
+
+		state = turning;
+		communicationManager->SendMsg(MESSAGE::BLUE_LED);
+		initialTurningYaw = gyroscopeController->GetAdverageYaw();
+		
+		if(turningDirection == TurningDirection::left)
+			perfectAngle += 270;
+		else if(turningDirection == TurningDirection::right)
+			perfectAngle += 90;
+
+		gyroscopeController->SetTargetYaw(perfectAngle);
+		Turn();
+	}
+}
+
+
+
 /**
  * @brief Para los motores 
  */
@@ -206,24 +250,8 @@ void MotorsController::Stop(){
  */
 void MotorsController::NinetyGegreeTurn(){
 	communicationManager->SendMsg(MESSAGE::RED_LED);
-	Stright(false);	
-	digitalWrite(rightSpeed, NORMAL_SPEED);
-	digitalWrite(leftSpeed, NORMAL_SPEED);
-	delay(75);
 	Stop();
-	delay(100);
-
-	state = turning;
-	communicationManager->SendMsg(MESSAGE::BLUE_LED);
-	initialTurningYaw = gyroscopeController->GetAdverageYaw();
-	
-	if(turningDirection == TurningDirection::left)
-		perfectAngle += 270;
-	else if(turningDirection == TurningDirection::right)
-		perfectAngle += 90;
-
-	gyroscopeController->SetTargetYaw(perfectAngle);
-	Turn();
+	state = braking;
 }
 
 /**
