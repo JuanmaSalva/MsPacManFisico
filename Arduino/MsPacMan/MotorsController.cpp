@@ -214,7 +214,7 @@ void MotorsController::Braking(){
 		Stright(false);	
 		digitalWrite(rightSpeed, NORMAL_SPEED);
 		digitalWrite(leftSpeed, NORMAL_SPEED);
-		delay(100);
+		delay(75);
 		Stop();
 		delay(100);
 
