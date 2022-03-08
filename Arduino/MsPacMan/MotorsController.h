@@ -7,19 +7,20 @@ class GyroscopeController;
 class CommunicationManager;
 class DirectionController;
 
-#define NORMAL_SPEED 160
+#define NORMAL_SPEED 150
 #define REDUCED_SPEED 70
 #define INCREASED_SPEED 180
 
-#define TURNING_DEGREES_BUFFER 1.5
-#define STRIGHT_DEGREES_BUFFER 7.5
-#define MINIMUM_EXIT_TURN_TIME 250
+#define TURNING_DEGREES_BUFFER 2.0
+#define STRIGHT_DEGREES_BUFFER 15.0
+#define MINIMUM_EXIT_TURN_TIME 300
 
 enum State{
 	followingLine,
 	turning,
 	turnExit,
-	followGyroscope
+	followGyroscope,
+	braking
 };
 
 
@@ -51,6 +52,7 @@ private:
 	void Turning();
 	void TurnExit();
 	void FollowGyroscope();
+	void Braking();
 	
 	void Turn();
 	TurningDirection OverCorrectionDirection();
