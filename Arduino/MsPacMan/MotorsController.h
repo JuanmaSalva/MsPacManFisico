@@ -5,18 +5,22 @@
 class LineTracker;
 class GyroscopeController;
 class CommunicationManager;
+class DirectionController;
 
 #define NORMAL_SPEED 150
-#define REDUCED_SPEED 95
+#define REDUCED_SPEED 70
 #define INCREASED_SPEED 180
 
 #define TURNING_DEGREES_BUFFER 2.0
-#define MINIMUM_EXIT_TURN_TIME 250
+#define STRIGHT_DEGREES_BUFFER 15.0
+#define MINIMUM_EXIT_TURN_TIME 300
 
 enum State{
 	followingLine,
 	turning,
-	turnExit
+	turnExit,
+	followGyroscope,
+	braking
 };
 
 
@@ -32,10 +36,12 @@ private:
 	LineTracker* lineTracker;
 	GyroscopeController* gyroscopeController;
 	CommunicationManager* communicationManager = nullptr;
+	DirectionController* directionController;
 
 	State state;
 	float initialTurningYaw;
 	TurningDirection turningDirection;
+	TurningDirection nextDirection = TurningDirection::none;
 	long initialTime;
 	int perfectAngle; //el ángluo que deberia llevar el robot en relacion a la posicion de inicio
 
@@ -45,10 +51,13 @@ private:
 	void FollowLine();
 	void Turning();
 	void TurnExit();
+	void FollowGyroscope();
+	void Braking();
 	
 	void Turn();
-	bool IsInLine();
 	TurningDirection OverCorrectionDirection();
+	void AplyOverCorrection(TurningDirection dir);
+	float CurrentDirectionOffset();
 
 public:
 	void Stright(bool forwards); //Provisional para probar el bletooh, volver a provado luego
@@ -61,4 +70,5 @@ public:
 	void SetLineTracker(LineTracker* _lineTracker);
 	void SetGyroscopeController(GyroscopeController* _gyroscopeController);
 	void SetCommunicationManager(CommunicationManager* _communicationManager);
+	void SetDirectionController(DirectionController* _directionController);
 };

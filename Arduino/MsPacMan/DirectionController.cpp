@@ -2,10 +2,11 @@
 #include "MotorsController.h"
 
 DirectionController::DirectionController(){
-
+    currentInstruction = 0;
 }
 
-
-void DirectionController::SetMotorsController(MotorsController* m){
-	motorsController = m;
+TurningDirection DirectionController::GetNextDirection(){
+    TurningDirection aux = turningDirections[currentInstruction];
+    currentInstruction = (currentInstruction + 1) % 5;
+    return aux;
 }

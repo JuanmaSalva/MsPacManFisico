@@ -2,6 +2,7 @@
 #include "LineTracker.h"
 #include "GyroscopeController.h"
 #include "CommunicationManager.h"
+#include "DirectionController.h"
 
 MotorsController::MotorsController(){
 	state = followingLine;
@@ -20,7 +21,7 @@ void MotorsController::Init(){
 	Stop();
 	//Stright(true);
 	//delay(50); //para empezar con velocidad
-
+	nextDirection = directionController->GetNextDirection();
 }
 
 
@@ -36,22 +37,153 @@ void MotorsController::Update(){
 	case turnExit:
 		TurnExit();
 		break;
+	case followGyroscope:
+		FollowGyroscope();
+		break;
+	case braking:
+		Braking();
+		break;
 	default:
 		break;
 	}
 }
 
-void MotorsController::SetLineTracker(LineTracker* _lineTracker){
-	lineTracker = _lineTracker;
+
+/**
+ * @brief Método encargado de dirigir el robot cuando se va en linea recta.
+ * Se encarga de leer la acción que tiene que realizar dada por el lineTracker.
+ * Encargado de detectar cuando se tiene que empezar a girar.
+ */
+void MotorsController::FollowLine(){
+	Action currentAction = lineTracker->GetCurrentAction();
+	
+	if(currentAction == Action::straight){ //recto		
+		Stright(true);
+
+		if(CurrentDirectionOffset() > STRIGHT_DEGREES_BUFFER){
+			TurningDirection overCorrectionDir = OverCorrectionDirection();
+			AplyOverCorrection(overCorrectionDir);		
+		}
+		else {
+			analogWrite(leftSpeed, NORMAL_SPEED);
+			analogWrite(rightSpeed, NORMAL_SPEED);
+		}
+	}
+	else if(currentAction == turn){ //Giro 90 grados
+		if(nextDirection == TurningDirection::left){
+			turningDirection = left;
+			NinetyGegreeTurn();
+		}
+		else if (nextDirection == TurningDirection::right){
+			turningDirection = right;
+			NinetyGegreeTurn();
+		}
+		else{
+			nextDirection = directionController->GetNextDirection();
+			Stright(true);	
+			analogWrite(leftSpeed, NORMAL_SPEED);
+			analogWrite(rightSpeed, NORMAL_SPEED);
+			state = followGyroscope;
+			initialTime = millis();
+			//TODO mientras estamos en este estado, tenemos que seguir la trayectoria perfecta
+		}
+	}
+	else if (currentAction == leftCorrection) { //desvio derecha
+		Stright(true);
+
+		if(CurrentDirectionOffset() > STRIGHT_DEGREES_BUFFER){
+			analogWrite(leftSpeed, (int)(REDUCED_SPEED * 0.8f));
+			analogWrite(rightSpeed, (int)(INCREASED_SPEED * 1.2f));
+		}
+		else {
+			analogWrite(leftSpeed, REDUCED_SPEED);
+			analogWrite(rightSpeed, INCREASED_SPEED);
+		}
+	}
+	else if(currentAction == rightCorrection){ //desvio izquierda
+		Stright(true);
+
+		if(CurrentDirectionOffset() > STRIGHT_DEGREES_BUFFER){
+			analogWrite(leftSpeed, (int)(INCREASED_SPEED * 1.2f));
+			analogWrite(rightSpeed, (int)(REDUCED_SPEED * 0.8f));
+		}
+		else {
+			analogWrite(leftSpeed, INCREASED_SPEED);
+			analogWrite(rightSpeed, REDUCED_SPEED);
+		}
+	}
+	else if (currentAction == lost){ //parada
+		Stop();
+	}
 }
 
-void MotorsController::SetGyroscopeController(GyroscopeController* _gyroscopeController){
-	gyroscopeController = _gyroscopeController;
+/**
+ * @brief Controla el giro, encargado de pararlo cuando es necesario 
+ */
+void MotorsController::Turning(){
+	if(abs((perfectAngle % 360) - gyroscopeController->GetCurrentYaw()) < TURNING_DEGREES_BUFFER){
+		turningDirection = (turningDirection == right) ? left: right;
+		Turn();
+		delay(100);
+		turningDirection = none;
+
+		Stop();
+		delay(100);
+		Stright(true);	
+		digitalWrite(rightSpeed, NORMAL_SPEED);
+		digitalWrite(leftSpeed, NORMAL_SPEED);
+		state = turnExit;
+		initialTime = millis();
+		gyroscopeController->ResetYaw();
+	}
 }
 
-void MotorsController::SetCommunicationManager(CommunicationManager* _communicationManager){
-	communicationManager = _communicationManager;
+/**
+ * @brief Encargado de dirigir el robot los instantes posteriores a un giro
+ * Encargado tambien de sobrecorregirlo para salir en la dirección correcta
+ */
+void MotorsController::TurnExit(){
+	Stright(true);
+	
+	if(CurrentDirectionOffset() < TURNING_DEGREES_BUFFER){ //si está alineado
+		if(millis() - initialTime > MINIMUM_EXIT_TURN_TIME)
+		{
+			communicationManager->SendMsg(MESSAGE::GREEN_LED);
+			state = followingLine;
+			analogWrite(leftSpeed, NORMAL_SPEED);
+			analogWrite(rightSpeed, NORMAL_SPEED); 
+			nextDirection = directionController->GetNextDirection(); 
+		}
+		else {
+			//Si esta en linea pero aun no ha pasado suficiente tiempo mínimo, se
+			//acelera más rápido para recuperar la velocidad de cricero 
+			analogWrite(leftSpeed, INCREASED_SPEED);
+			analogWrite(rightSpeed, INCREASED_SPEED);  
+		}
+	}
+	else{
+		TurningDirection overCorrectionDir = OverCorrectionDirection();
+		AplyOverCorrection(overCorrectionDir);
+	}
 }
+
+/**
+ * @brief Encargado de dirigir el robot guiandose únicamente por los datos 
+ * recibidos por el giroscopio 
+ */
+void MotorsController::FollowGyroscope(){
+	TurningDirection overCorrectionDir = OverCorrectionDirection();
+	AplyOverCorrection(overCorrectionDir);
+
+	//hemos salido de la zona de la interseccion (zona negra) y los sensores ya detectan
+	//los carriles. Ya se puede volver al control normal
+	if(lineTracker->GetCurrentAction() == Action::straight || 
+	millis() - initialTime > MINIMUM_EXIT_TURN_TIME){
+		state = followingLine;
+		communicationManager->SendMsg(MESSAGE::GREEN_LED);
+	}
+}
+
 
 /**
  * @brief Establece los motores para ir en linea recta
@@ -73,6 +205,35 @@ void MotorsController::Stright(bool forwards){
 	}
 }
 
+
+
+void MotorsController::Braking(){
+	Action currentAction = lineTracker->GetCurrentAction();
+
+	if(currentAction == Action::straight){
+		Stright(false);	
+		digitalWrite(rightSpeed, NORMAL_SPEED);
+		digitalWrite(leftSpeed, NORMAL_SPEED);
+		delay(75);
+		Stop();
+		delay(100);
+
+		state = turning;
+		communicationManager->SendMsg(MESSAGE::BLUE_LED);
+		initialTurningYaw = gyroscopeController->GetAdverageYaw();
+		
+		if(turningDirection == TurningDirection::left)
+			perfectAngle += 270;
+		else if(turningDirection == TurningDirection::right)
+			perfectAngle += 90;
+
+		gyroscopeController->SetTargetYaw(perfectAngle);
+		Turn();
+	}
+}
+
+
+
 /**
  * @brief Para los motores 
  */
@@ -89,19 +250,8 @@ void MotorsController::Stop(){
  */
 void MotorsController::NinetyGegreeTurn(){
 	communicationManager->SendMsg(MESSAGE::RED_LED);
-	Stright(false);	
-	digitalWrite(rightSpeed, NORMAL_SPEED);
-	digitalWrite(leftSpeed, NORMAL_SPEED);
-	delay(75);
 	Stop();
-	delay(100);
-
-	state = turning;
-	communicationManager->SendMsg(MESSAGE::BLUE_LED);
-	initialTurningYaw = gyroscopeController->GetAdverageYaw();
-	perfectAngle += 270;
-	gyroscopeController->SetTargetYaw(perfectAngle);
-	Turn();
+	state = braking;
 }
 
 /**
@@ -130,80 +280,29 @@ void MotorsController::Turn(){
 
 
 
-/**
- * @brief Método encargado de dirigir el robot cuando se va en linea recta.
- * Se encarga de leer la acción que tiene que realizar dada por el lineTracker.
- * Encargado de detectar cuando se tiene que empezar a girar.
- */
-void MotorsController::FollowLine(){
-	Action currentAction = lineTracker->GetCurrentAction();
- 
-	if(currentAction == straight){ //recto
-		Stright(true);
-		analogWrite(leftSpeed, NORMAL_SPEED);
-		analogWrite(rightSpeed, NORMAL_SPEED);
-	}
-	else if(currentAction == leftTurn){ //Giro 90 grados
-		turningDirection = left;
-		NinetyGegreeTurn();
-	}
-	else if (currentAction == leftCorrection) { //desvio derecha
-		Stright(true);
-		analogWrite(leftSpeed, REDUCED_SPEED);
-		analogWrite(rightSpeed, INCREASED_SPEED);
-	}
-	else if(currentAction == rightCorrection){ //desvio izquierda
-		Stright(true);
-		analogWrite(leftSpeed, INCREASED_SPEED);
-		analogWrite(rightSpeed, REDUCED_SPEED);
-	}
-	else if (currentAction == lost){ //parada
-		Stop();
-	}
-}
 
-/**
- * @brief Controla el giro, encargado de pararlo cuando es necesario 
- */
-void MotorsController::Turning(){
-	if(abs((perfectAngle % 360) - gyroscopeController->GetCurrentYaw()) < TURNING_DEGREES_BUFFER){
-		turningDirection = (turningDirection == right) ? left: right;
-		Turn();
-		delay(100);
-		turningDirection = none;
 
-		Stop();
-		delay(100);
-		Stright(true);	
-		digitalWrite(rightSpeed, NORMAL_SPEED);
-		digitalWrite(leftSpeed, NORMAL_SPEED);
-		state = turnExit;
-		initialTime = millis();
-		gyroscopeController->ResetYaw();
-	}
-}
+
+
 
 
 /**
- * @brief Revisa si el robor está orientado en la dirección correcta
- * 
- * @return true si está bien orientado
- * @return false si no está bien orientado
+ * @brief Devuelve en grados positivos, la desviacion de la trayectorio del robot
+ * en un determinado instante respecto la direccion que debería tener (perfectAngle) 
+ * @return desviacion en grados positivos
  */
-bool MotorsController::IsInLine(){
+float MotorsController::CurrentDirectionOffset(){
 	int angleModule = perfectAngle % 360;
 
 	if(angleModule == 0){
-		if(gyroscopeController->GetCurrentYaw() < TURNING_DEGREES_BUFFER ||
-		gyroscopeController->GetCurrentYaw() > 360 - TURNING_DEGREES_BUFFER)
-			return true;
-		else 
-			return false;
+		if(gyroscopeController->GetCurrentYaw() < 180)
+			return gyroscopeController->GetCurrentYaw();
+		else
+			return 360 - gyroscopeController->GetCurrentYaw();
 	}
 	else
-		return (abs(angleModule - gyroscopeController->GetCurrentYaw()) < TURNING_DEGREES_BUFFER);	
+		return abs(angleModule - gyroscopeController->GetCurrentYaw());	
 }
-
 
 /**
  * @brief Devuelve la dirección hacia la que el robot tiene que sobre-corregir tras realizar un giro de 90 grados * 
@@ -219,37 +318,38 @@ TurningDirection MotorsController::OverCorrectionDirection(){
 
 
 /**
- * @brief Encargado de dirigir el robot los instantes posteriores a un giro
- * Encargado tambien de sobrecorregirlo para salir en la dirección correcta
+ * @brief Cambia las velocidades de los motores para realizar la sobrecorrección necesaria
+ * 
+ * @param dir dirección a la que tenemos que sobrecorregir
  */
-void MotorsController::TurnExit(){
-	Stright(true);
-	
-	if(IsInLine()){
-		if(millis() - initialTime > MINIMUM_EXIT_TURN_TIME)
-		{
-			communicationManager->SendMsg(MESSAGE::GREEN_LED);
-			state = followingLine;
-			analogWrite(leftSpeed, NORMAL_SPEED);
-			analogWrite(rightSpeed, NORMAL_SPEED);  
-		}
-		else {
-			//Si esta en linea pero aun no ha pasado suficiente tiempo mínimo, se
-			//acelera más rápido para recuperar la velocidad de cricero 
-			analogWrite(leftSpeed, INCREASED_SPEED);
-			analogWrite(rightSpeed, INCREASED_SPEED);  
-		}
+void MotorsController::AplyOverCorrection(TurningDirection dir){
+	if(dir == left){
+		analogWrite(leftSpeed, REDUCED_SPEED);
+		analogWrite(rightSpeed, INCREASED_SPEED);
 	}
-	else{
-		TurningDirection overCorrectionDir = OverCorrectionDirection();
+	else if (dir == right){
+		analogWrite(leftSpeed, INCREASED_SPEED);
+		analogWrite(rightSpeed, REDUCED_SPEED);
+	}
+	else { //no deberia de llegar aquí nunca
+		analogWrite(leftSpeed, NORMAL_SPEED);
+		analogWrite(rightSpeed, NORMAL_SPEED);
+	}
+}
 
-		if(overCorrectionDir == right){ //corregimos a la derecha  
-			analogWrite(leftSpeed, INCREASED_SPEED);
-			analogWrite(rightSpeed, REDUCED_SPEED/2);    
-		}
-		else if(overCorrectionDir == left){ //corregimos a la izquierda   
-			analogWrite(leftSpeed, REDUCED_SPEED/2);
-			analogWrite(rightSpeed, INCREASED_SPEED);  
-		}
-	}
+
+void MotorsController::SetLineTracker(LineTracker* _lineTracker){
+	lineTracker = _lineTracker;
+}
+
+void MotorsController::SetGyroscopeController(GyroscopeController* _gyroscopeController){
+	gyroscopeController = _gyroscopeController;
+}
+
+void MotorsController::SetCommunicationManager(CommunicationManager* _communicationManager){
+	communicationManager = _communicationManager;
+}
+
+void MotorsController::SetDirectionController(DirectionController* _directionController){
+	directionController = _directionController;
 }

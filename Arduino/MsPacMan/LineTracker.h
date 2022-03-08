@@ -9,8 +9,7 @@ enum Action {
 	straight, 
 	leftCorrection, 
 	rightCorrection, 
-	leftTurn,
-	//rightTurn,
+	turn,
 	lost
 };
 

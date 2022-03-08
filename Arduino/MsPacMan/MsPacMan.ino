@@ -39,20 +39,20 @@ void setup() {
 		communicationManager->WaitApproval();
 	}
 
+	//Direccion Controller
+	directionController = new DirectionController();
+	
 	//Motors Controller
 	motorsController = new MotorsController();
-	motorsController->Init();
 	motorsController->SetLineTracker(lineTracker);
 	motorsController->SetGyroscopeController(gyroscopeController);
+	motorsController->SetDirectionController(directionController);
+	motorsController->Init();
 	if(!DEBUG){
 		communicationManager->SendMsg(MOTORS_INITIALIZED);
 		communicationManager->WaitApproval();
 		motorsController->SetCommunicationManager(communicationManager);
 	}
-
-	//Direccion Controller
-	directionController = new DirectionController();
-	directionController->SetMotorsController(motorsController);
 
 
 	if(!DEBUG){
