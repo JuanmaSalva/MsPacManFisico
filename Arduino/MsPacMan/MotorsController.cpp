@@ -208,13 +208,13 @@ void MotorsController::Stright(bool forwards){
 
 
 void MotorsController::Braking(){
-	Action currentAction = lineTracker->GetCurrentAction();
+	//Action currentAction = lineTracker->GetCurrentAction();
 
-	if(currentAction == Action::straight){
+	//if(currentAction == Action::straight){
 		Stright(false);	
 		digitalWrite(rightSpeed, NORMAL_SPEED);
 		digitalWrite(leftSpeed, NORMAL_SPEED);
-		delay(75);
+		delay(50);
 		Stop();
 		delay(100);
 
@@ -229,7 +229,7 @@ void MotorsController::Braking(){
 
 		gyroscopeController->SetTargetYaw(perfectAngle);
 		Turn();
-	}
+	//}
 }
 
 

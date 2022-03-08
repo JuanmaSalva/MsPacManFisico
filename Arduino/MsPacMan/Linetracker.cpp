@@ -15,21 +15,14 @@ void LineTracker::Update(){
 	int _center = digitalRead(SENSOR_C);
 	int _right = digitalRead(SENSOR_R);
 
-	// Serial.print(left);
-	// Serial.print(" ");
-	// Serial.print(center);
-	// Serial.print(" ");
-	// Serial.println(right);
 	if(_left == LINE && _center == CORRIDOR && _right == LINE) //recto
 		currentAction = Action::straight;
-	else if (_left == CORRIDOR && _right == LINE)  //desvio derecha
+	else if (_left == CORRIDOR && (_right == LINE || _center == LINE))  //desvio derecha
 		currentAction = Action::leftCorrection;
-	else if(_left == LINE && _right == CORRIDOR) //desvio izquierda
+	else if((_left == LINE || _center == LINE) && _right == CORRIDOR) //desvio izquierda
 		currentAction = Action::rightCorrection;      
-	else if(_left == LINE && _center == LINE && _right == LINE) //TODO de momento provisional
-	{
+	else if(_left == LINE && _center == LINE && _right == LINE) //interseccion
 		currentAction = Action::turn;
-	}   
 	else
 		currentAction = Action::lost;
 }
