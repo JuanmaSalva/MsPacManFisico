@@ -12,8 +12,8 @@ class DirectionController;
 #define INCREASED_SPEED 180
 
 #define TURNING_DEGREES_BUFFER 2.0
-#define STRIGHT_DEGREES_BUFFER 15.0
-#define MINIMUM_EXIT_TURN_TIME 300
+#define STRIGHT_DEGREES_BUFFER 10.0
+#define MINIMUM_EXIT_TURN_TIME 250
 
 enum State{
 	followingLine,
