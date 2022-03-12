@@ -22,7 +22,7 @@ void MotorsController::Init(){
 	Stright(true);
 	analogWrite(leftSpeed, INCREASED_SPEED);
 	analogWrite(rightSpeed, INCREASED_SPEED);
-	LocalDelay(25); //para empezar con velocidad
+	delay(25); //para empezar con velocidad
 	nextDirection = directionController->GetNextDirection();
 }
 
@@ -125,11 +125,11 @@ void MotorsController::Turning(){
 	if(abs((perfectAngle % 360) - gyroscopeController->GetCurrentYaw()) < TURNING_DEGREES_BUFFER){
 		turningDirection = (turningDirection == right) ? left: right;
 		Turn();
-		LocalDelay(100);
+		delay(100);
 		turningDirection = none;
 
 		Stop();
-		LocalDelay(100);
+		delay(100);
 		Stright(true);	
 		digitalWrite(rightSpeed, NORMAL_SPEED);
 		digitalWrite(leftSpeed, NORMAL_SPEED);
@@ -222,9 +222,9 @@ void MotorsController::Braking(){
 	Stright(false);	
 	digitalWrite(rightSpeed, NORMAL_SPEED);
 	digitalWrite(leftSpeed, NORMAL_SPEED);
-	LocalDelay(GetBrakingTime());
+	delay(GetBrakingTime());
 	Stop();
-	LocalDelay(250);
+	delay(250);
 
 	state = turning;
 	//communicationManager->SendMsg(MESSAGE::BLUE_LED);
@@ -349,16 +349,16 @@ void MotorsController::AplyOverCorrection(TurningDirection dir){
 	}
 }
 
-void MotorsController::LocalDelay(int time){
-	communicationManager->SendMsg(MESSAGE::YELLOW_LED);
+// void MotorsController::LocalDelay(int time){
+// 	communicationManager->SendMsg(MESSAGE::YELLOW_LED);
 
-	long init = millis();
+// 	long init = millis();
 
-	while(millis() - init < time)
-	;
+// 	while(millis() - init < time)
+// 	;
 
-	communicationManager->SendMsg(MESSAGE::MAGENTA_LED);
-}
+// 	communicationManager->SendMsg(MESSAGE::MAGENTA_LED);
+// }
 
 void MotorsController::SetLineTracker(LineTracker* _lineTracker){
 	lineTracker = _lineTracker;
