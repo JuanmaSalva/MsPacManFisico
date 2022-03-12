@@ -11,9 +11,13 @@ class DirectionController;
 #define REDUCED_SPEED 60
 #define INCREASED_SPEED 170
 
+
 #define TURNING_DEGREES_BUFFER 2.0
 #define STRIGHT_DEGREES_BUFFER 10.0
 #define MINIMUM_EXIT_TURN_TIME 250
+
+#define FULL_BRAKE_TIME 110
+#define MIN_TIME_FOR_FULL_BRAKE 1250
 
 enum State{
 	followingLine,
@@ -58,6 +62,9 @@ private:
 	TurningDirection OverCorrectionDirection();
 	void AplyOverCorrection(TurningDirection dir);
 	float CurrentDirectionOffset();
+	int GetBrakingTime();
+
+	void LocalDelay(int time);
 
 public:
 	void Stright(bool forwards); //Provisional para probar el bletooh, volver a provado luego

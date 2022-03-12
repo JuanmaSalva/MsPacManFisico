@@ -18,9 +18,11 @@ void MotorsController::Init(){
 	pinMode(backwardLeft, OUTPUT);
 	pinMode(leftSpeed, OUTPUT);
 
-	Stop();
-	//Stright(true);
-	//delay(50); //para empezar con velocidad
+	//Stop();
+	Stright(true);
+	analogWrite(leftSpeed, INCREASED_SPEED);
+	analogWrite(rightSpeed, INCREASED_SPEED);
+	LocalDelay(25); //para empezar con velocidad
 	nextDirection = directionController->GetNextDirection();
 }
 
@@ -123,11 +125,11 @@ void MotorsController::Turning(){
 	if(abs((perfectAngle % 360) - gyroscopeController->GetCurrentYaw()) < TURNING_DEGREES_BUFFER){
 		turningDirection = (turningDirection == right) ? left: right;
 		Turn();
-		delay(100);
+		LocalDelay(100);
 		turningDirection = none;
 
 		Stop();
-		delay(100);
+		LocalDelay(100);
 		Stright(true);	
 		digitalWrite(rightSpeed, NORMAL_SPEED);
 		digitalWrite(leftSpeed, NORMAL_SPEED);
@@ -149,6 +151,7 @@ void MotorsController::TurnExit(){
 		{
 			communicationManager->SendMsg(MESSAGE::GREEN_LED);
 			state = followingLine;
+			initialTime = millis();
 			analogWrite(leftSpeed, NORMAL_SPEED);
 			analogWrite(rightSpeed, NORMAL_SPEED); 
 			nextDirection = directionController->GetNextDirection(); 
@@ -212,17 +215,19 @@ void MotorsController::Stright(bool forwards){
 }
 
 
-
+/**
+ * @brief Encargado de invertir la dirección de los motors para frenar exactamente incuma de la interseccion 
+ */
 void MotorsController::Braking(){
 	Stright(false);	
 	digitalWrite(rightSpeed, NORMAL_SPEED);
 	digitalWrite(leftSpeed, NORMAL_SPEED);
-	delay(120);
+	LocalDelay(GetBrakingTime());
 	Stop();
-	delay(250);
+	LocalDelay(250);
 
 	state = turning;
-	communicationManager->SendMsg(MESSAGE::BLUE_LED);
+	//communicationManager->SendMsg(MESSAGE::BLUE_LED);
 	initialTurningYaw = gyroscopeController->GetAdverageYaw();
 	
 	if(turningDirection == TurningDirection::left)
@@ -234,6 +239,16 @@ void MotorsController::Braking(){
 	Turn();
 }
 
+
+int MotorsController::GetBrakingTime(){
+	if(millis() - initialTime > MIN_TIME_FOR_FULL_BRAKE){
+		return FULL_BRAKE_TIME;
+	}
+	else{
+		return ((millis() - initialTime) * FULL_BRAKE_TIME) / MIN_TIME_FOR_FULL_BRAKE;
+	}
+	return FULL_BRAKE_TIME;
+}
 
 
 /**
@@ -279,11 +294,6 @@ void MotorsController::Turn(){
 		digitalWrite(backwardRight, LOW);
 	}
 }
-
-
-
-
-
 
 
 
@@ -339,6 +349,16 @@ void MotorsController::AplyOverCorrection(TurningDirection dir){
 	}
 }
 
+void MotorsController::LocalDelay(int time){
+	communicationManager->SendMsg(MESSAGE::YELLOW_LED);
+
+	long init = millis();
+
+	while(millis() - init < time)
+	;
+
+	communicationManager->SendMsg(MESSAGE::MAGENTA_LED);
+}
 
 void MotorsController::SetLineTracker(LineTracker* _lineTracker){
 	lineTracker = _lineTracker;
