@@ -7,9 +7,9 @@ class GyroscopeController;
 class CommunicationManager;
 class DirectionController;
 
-#define NORMAL_SPEED 150
-#define REDUCED_SPEED 70
-#define INCREASED_SPEED 180
+#define NORMAL_SPEED 140
+#define REDUCED_SPEED 60
+#define INCREASED_SPEED 170
 
 #define TURNING_DEGREES_BUFFER 2.0
 #define STRIGHT_DEGREES_BUFFER 10.0
