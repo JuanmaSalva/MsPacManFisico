@@ -7,13 +7,17 @@ class GyroscopeController;
 class CommunicationManager;
 class DirectionController;
 
-#define NORMAL_SPEED 150
-#define REDUCED_SPEED 70
-#define INCREASED_SPEED 180
+#define NORMAL_SPEED 140
+#define REDUCED_SPEED 60
+#define INCREASED_SPEED 170
+
 
 #define TURNING_DEGREES_BUFFER 2.0
-#define STRIGHT_DEGREES_BUFFER 15.0
-#define MINIMUM_EXIT_TURN_TIME 300
+#define STRIGHT_DEGREES_BUFFER 10.0
+#define MINIMUM_EXIT_TURN_TIME 250
+
+#define FULL_BRAKE_TIME 110
+#define MIN_TIME_FOR_FULL_BRAKE 1400
 
 enum State{
 	followingLine,
@@ -58,6 +62,7 @@ private:
 	TurningDirection OverCorrectionDirection();
 	void AplyOverCorrection(TurningDirection dir);
 	float CurrentDirectionOffset();
+	int GetBrakingTime();
 
 public:
 	void Stright(bool forwards); //Provisional para probar el bletooh, volver a provado luego

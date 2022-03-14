@@ -18,9 +18,11 @@ void MotorsController::Init(){
 	pinMode(backwardLeft, OUTPUT);
 	pinMode(leftSpeed, OUTPUT);
 
-	Stop();
-	//Stright(true);
-	//delay(50); //para empezar con velocidad
+	//Stop();
+	Stright(true);
+	analogWrite(leftSpeed, INCREASED_SPEED);
+	analogWrite(rightSpeed, INCREASED_SPEED);
+	delay(25); //para empezar con velocidad
 	nextDirection = directionController->GetNextDirection();
 }
 
@@ -85,7 +87,6 @@ void MotorsController::FollowLine(){
 			analogWrite(rightSpeed, NORMAL_SPEED);
 			state = followGyroscope;
 			initialTime = millis();
-			//TODO mientras estamos en este estado, tenemos que seguir la trayectoria perfecta
 		}
 	}
 	else if (currentAction == leftCorrection) { //desvio derecha
@@ -150,6 +151,7 @@ void MotorsController::TurnExit(){
 		{
 			communicationManager->SendMsg(MESSAGE::GREEN_LED);
 			state = followingLine;
+			initialTime = millis();
 			analogWrite(leftSpeed, NORMAL_SPEED);
 			analogWrite(rightSpeed, NORMAL_SPEED); 
 			nextDirection = directionController->GetNextDirection(); 
@@ -172,12 +174,19 @@ void MotorsController::TurnExit(){
  * recibidos por el giroscopio 
  */
 void MotorsController::FollowGyroscope(){
-	TurningDirection overCorrectionDir = OverCorrectionDirection();
-	AplyOverCorrection(overCorrectionDir);
+	if(CurrentDirectionOffset() > TURNING_DEGREES_BUFFER){
+		TurningDirection overCorrectionDir = OverCorrectionDirection();
+		AplyOverCorrection(overCorrectionDir);
+	}
+	else{
+		Stright(true);
+		analogWrite(leftSpeed, NORMAL_SPEED);
+		analogWrite(rightSpeed, NORMAL_SPEED);
+	}
 
 	//hemos salido de la zona de la interseccion (zona negra) y los sensores ya detectan
 	//los carriles. Ya se puede volver al control normal
-	if(lineTracker->GetCurrentAction() == Action::straight || 
+	if(lineTracker->GetCurrentAction() == Action::straight ||
 	millis() - initialTime > MINIMUM_EXIT_TURN_TIME){
 		state = followingLine;
 		communicationManager->SendMsg(MESSAGE::GREEN_LED);
@@ -206,32 +215,40 @@ void MotorsController::Stright(bool forwards){
 }
 
 
-
+/**
+ * @brief Encargado de invertir la dirección de los motors para frenar exactamente incuma de la interseccion 
+ */
 void MotorsController::Braking(){
-	Action currentAction = lineTracker->GetCurrentAction();
+	Stright(false);	
+	digitalWrite(rightSpeed, NORMAL_SPEED);
+	digitalWrite(leftSpeed, NORMAL_SPEED);
+	delay(GetBrakingTime());
+	Stop();
+	delay(250);
 
-	if(currentAction == Action::straight){
-		Stright(false);	
-		digitalWrite(rightSpeed, NORMAL_SPEED);
-		digitalWrite(leftSpeed, NORMAL_SPEED);
-		delay(75);
-		Stop();
-		delay(100);
+	state = turning;
+	//communicationManager->SendMsg(MESSAGE::BLUE_LED);
+	initialTurningYaw = gyroscopeController->GetAdverageYaw();
+	
+	if(turningDirection == TurningDirection::left)
+		perfectAngle += 270;
+	else if(turningDirection == TurningDirection::right)
+		perfectAngle += 90;
 
-		state = turning;
-		communicationManager->SendMsg(MESSAGE::BLUE_LED);
-		initialTurningYaw = gyroscopeController->GetAdverageYaw();
-		
-		if(turningDirection == TurningDirection::left)
-			perfectAngle += 270;
-		else if(turningDirection == TurningDirection::right)
-			perfectAngle += 90;
-
-		gyroscopeController->SetTargetYaw(perfectAngle);
-		Turn();
-	}
+	gyroscopeController->SetTargetYaw(perfectAngle);
+	Turn();
 }
 
+
+int MotorsController::GetBrakingTime(){
+	if(millis() - initialTime > MIN_TIME_FOR_FULL_BRAKE){
+		return FULL_BRAKE_TIME;
+	}
+	else{
+		return ((millis() - initialTime) * FULL_BRAKE_TIME) / MIN_TIME_FOR_FULL_BRAKE;
+	}
+	return FULL_BRAKE_TIME;
+}
 
 
 /**
@@ -277,11 +294,6 @@ void MotorsController::Turn(){
 		digitalWrite(backwardRight, LOW);
 	}
 }
-
-
-
-
-
 
 
 
@@ -337,6 +349,16 @@ void MotorsController::AplyOverCorrection(TurningDirection dir){
 	}
 }
 
+// void MotorsController::LocalDelay(int time){
+// 	communicationManager->SendMsg(MESSAGE::YELLOW_LED);
+
+// 	long init = millis();
+
+// 	while(millis() - init < time)
+// 	;
+
+// 	communicationManager->SendMsg(MESSAGE::MAGENTA_LED);
+// }
 
 void MotorsController::SetLineTracker(LineTracker* _lineTracker){
 	lineTracker = _lineTracker;
