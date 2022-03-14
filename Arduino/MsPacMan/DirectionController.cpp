@@ -7,6 +7,6 @@ DirectionController::DirectionController(){
 
 TurningDirection DirectionController::GetNextDirection(){
     TurningDirection aux = turningDirections[currentInstruction];
-    currentInstruction = (currentInstruction + 1) % 10;
+    currentInstruction = (currentInstruction + 1) % 13;
     return aux;
 }

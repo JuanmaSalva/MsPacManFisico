@@ -16,8 +16,8 @@ class DirectionController;
 #define STRIGHT_DEGREES_BUFFER 10.0
 #define MINIMUM_EXIT_TURN_TIME 250
 
-#define FULL_BRAKE_TIME 110
-#define MIN_TIME_FOR_FULL_BRAKE 1400
+#define FULL_BRAKE_TIME 120
+#define MIN_TIME_FOR_FULL_BRAKE 1500
 
 enum State{
 	followingLine,
