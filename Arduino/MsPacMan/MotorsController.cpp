@@ -25,7 +25,7 @@ void MotorsController::Start(){
 	Stright(true);
 	analogWrite(leftSpeed, INCREASED_SPEED);
 	analogWrite(rightSpeed, INCREASED_SPEED);
-	delay(25); //para empezar con velocidad
+	delay(50); //para empezar con velocidad
 	nextDirection = directionController->GetNextDirection();
 }
 

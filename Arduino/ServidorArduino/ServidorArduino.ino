@@ -40,7 +40,7 @@ void setup() {
 
 
 	serverManager->WaitForMsg(JAVA_MESSAGE::JAVA_START);
-	//communicationManager->SendMsg(MESSAGE::START);
+	communicationManager->SendMsg(MESSAGE::START);
 
 
 	analogWrite(red, 0);

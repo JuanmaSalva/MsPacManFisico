@@ -15,7 +15,7 @@ public class CommunicationManager {
 		
 		
 		public static void SendMsg(JAVA_MESSAGE msg) {
-			/*switch(msg) {
+			switch(msg) {
 			case PAC_MAN_UP:
 				System.out.println("UP");
 			break;
@@ -34,7 +34,7 @@ public class CommunicationManager {
 			default:
 				System.out.println("Non identified msg");
 			break;
-			}*/
+			}
 			
 			if(sp != null) {
 				try {
