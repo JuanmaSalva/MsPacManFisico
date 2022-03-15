@@ -10,34 +10,27 @@ GyroscopeController* gyroscopeController;
 CommunicationManager* communicationManager;
 DirectionController* directionController;
 
-bool DEBUG = false;
 
 void setup() {
 	Serial.begin(9600);
-	Serial.println("Inicializamos");
 
 	//Communication Manager
-	if(!DEBUG){
-		communicationManager = new CommunicationManager();
-		communicationManager->Init();
-		communicationManager->Sync();
-	}
+	communicationManager = new CommunicationManager();
+	communicationManager->Init();
+	communicationManager->Sync();
 
 	//Line tracker
 	lineTracker = new LineTracker();
 	lineTracker->Init();
-	if(!DEBUG){
-		communicationManager->SendMsg(LINE_TRACKER_INITIALIZED);
-		communicationManager->WaitApproval();
-	}
+	communicationManager->SendMsg(LINE_TRACKER_INITIALIZED);
+	communicationManager->WaitApproval();
+	
 
 	//Gyroscope Controller
 	gyroscopeController = new GyroscopeController();
 	gyroscopeController->Init();
-	if(!DEBUG){
-		communicationManager->SendMsg(GYROSCOPE_INITIALIZED);
-		communicationManager->WaitApproval();
-	}
+	communicationManager->SendMsg(GYROSCOPE_INITIALIZED);
+	communicationManager->WaitApproval();
 
 	//Direccion Controller
 	directionController = new DirectionController();
@@ -47,20 +40,20 @@ void setup() {
 	motorsController->SetLineTracker(lineTracker);
 	motorsController->SetGyroscopeController(gyroscopeController);
 	motorsController->SetDirectionController(directionController);
+	motorsController->SetCommunicationManager(communicationManager);
 	motorsController->Init();
-	if(!DEBUG){
-		communicationManager->SendMsg(MOTORS_INITIALIZED);
-		communicationManager->WaitApproval();
-		motorsController->SetCommunicationManager(communicationManager);
-	}
+	communicationManager->SendMsg(MOTORS_INITIALIZED);
+	communicationManager->WaitApproval();
 
 
-	if(!DEBUG){
-		communicationManager->SetDirectionController(directionController);
-		communicationManager->SendMsg(DIRECCTION_INITIALIZED);
-		communicationManager->WaitApproval();
-		communicationManager->SendMsg(MESSAGE::GREEN_LED);
-	}
+	communicationManager->SetDirectionController(directionController);
+	communicationManager->SendMsg(DIRECCTION_INITIALIZED);
+	communicationManager->WaitApproval();
+
+	//Esperamos a la orden de empezar a jugar
+	communicationManager->WaitForMsg(MESSAGE::START);
+	communicationManager->SendMsg(MESSAGE::GREEN_LED);
+	motorsController->Start();
 }
 
 
@@ -68,6 +61,5 @@ void loop() {
 	lineTracker->Update();
 	gyroscopeController->Update();
 	motorsController->Update();
-
 	communicationManager->Update();	
 }

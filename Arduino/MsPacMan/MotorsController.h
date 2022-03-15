@@ -70,6 +70,7 @@ public:
 
 	MotorsController();
 	void Init();
+	void Start();
 	void Update();
 
 	void SetLineTracker(LineTracker* _lineTracker);

@@ -23,13 +23,6 @@ void setup() {
 	analogWrite(blue, 0);
 
 
-	serverManager = new ServerManager();
-	//serverManager->SyncToJava();
-
-	analogWrite(red, 0);
-	analogWrite(green, 0);
-	analogWrite(blue, 255);
-
 	//inicialización y sincronización de la comunicación con el robot
 	communicationManager = new CommunicationManager();
 	communicationManager->Init();
@@ -38,12 +31,20 @@ void setup() {
 
 
 	analogWrite(red, 0);
-	analogWrite(green, 255);
-	analogWrite(blue, 0);
-	
-	delay(50);
-	analogWrite(red, 0);
 	analogWrite(green, 0);
+	analogWrite(blue, 255);
+
+
+	serverManager = new ServerManager();
+	serverManager->SyncToJava();
+
+
+	serverManager->WaitForMsg(JAVA_MESSAGE::JAVA_START);
+	//communicationManager->SendMsg(MESSAGE::START);
+
+
+	analogWrite(red, 0);
+	analogWrite(green, 255);
 	analogWrite(blue, 0);
 }
 
@@ -113,7 +114,7 @@ void DebugLed(){
 }
 
 void loop() {
-	//Java();
+	Java();
 
 	DebugLed();
 }

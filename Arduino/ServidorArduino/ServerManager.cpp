@@ -41,3 +41,19 @@ JAVA_MESSAGE ServerManager::ReadMsg(){
     JAVA_MESSAGE msg = (JAVA_MESSAGE)Serial.read();
     return msg;
 }
+
+
+/**
+ * @brief Esperamos hasta recibir un mensaje en concreto. Todos los mensajes
+ * que se reciban que no sean el esperado serán ignorados * 
+ * 
+ * @param msg Mensaje esperado
+ */
+void ServerManager::WaitForMsg(JAVA_MESSAGE msg){
+	while(true){
+		if(Serial.available() && ReadMsg() == msg){
+			break;
+		}
+		delay(5);
+	}
+}

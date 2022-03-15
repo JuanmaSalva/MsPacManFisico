@@ -644,7 +644,9 @@ public class Executor {
         GameView gv = (visuals) ? setupGameView(pacManController, game) : null;
 
         GhostController ghostControllerCopy = ghostController.copy(ghostPO);
-
+        
+        observer.gameStarted();
+        
         while (!game.gameOver()) {
             if (tickLimit != -1 && tickLimit < game.getTotalTime()) {
                 break;

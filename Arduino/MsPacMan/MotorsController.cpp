@@ -18,14 +18,16 @@ void MotorsController::Init(){
 	pinMode(backwardLeft, OUTPUT);
 	pinMode(leftSpeed, OUTPUT);
 
-	//Stop();
+	Stop();
+}
+
+void MotorsController::Start(){
 	Stright(true);
 	analogWrite(leftSpeed, INCREASED_SPEED);
 	analogWrite(rightSpeed, INCREASED_SPEED);
 	delay(25); //para empezar con velocidad
 	nextDirection = directionController->GetNextDirection();
 }
-
 
 void MotorsController::Update(){
 	switch (state)
