@@ -2,6 +2,10 @@ package main;
 
 import java.io.IOException;
 
+import com.fazecast.jSerialComm.SerialPort;
+
+import communication.CommunicationManager;
+import communication.JAVA_MESSAGE;
 import pacman.Executor;
 import pacman.controllers.GhostController;
 import pacman.controllers.GhostsRandom;
@@ -15,7 +19,6 @@ public class main {
 
 	public static void main(String[] args) throws IOException, InterruptedException{		
 		
-		startExecution();
 		/*System.out.println("Vamos a inicializar el arduino");
 	
 		SerialPort sp = SerialPort.getCommPort("/dev/ttyACM0"); //TODO esto deberia estar parametrizado
@@ -48,42 +51,22 @@ public class main {
 		
 		
 		while(!start) {
+			CommunicationManager.MessageSender.SendMsg(JAVA_MESSAGE.SYNC_ATTEMP);
 			
-			try {
-				JAVA_MESSAGE msg = JAVA_MESSAGE.SYNC_ATTEMP;				
-				sp.getOutputStream().write((byte)msg.ordinal());
-				sp.getOutputStream().flush();
-				
-			} catch (IOException e) {
-				e.printStackTrace();
-				System.out.println("ERROR: No se ha podido mandar el dato");
-			}
-						
-			try {
-				int byteRead = 0;
-				byteRead = sp.getInputStream().read();
-				if(byteRead < JAVA_MESSAGE.values().length)
-				{
-					JAVA_MESSAGE msg = JAVA_MESSAGE.values()[byteRead];
-					
-					if(msg == JAVA_MESSAGE.SYNC) {
-						start = true;
-					}
-				}
-					
-			} catch(IOException e) {
-				System.out.println("ERROR: Ha fallado la lectura de datos");
-			}
-			
+			if(CommunicationManager.MessageSender.ReadMsg() == JAVA_MESSAGE.SYNC)	
+				start = true;			
 		}
+		
 
 		System.out.println("SINCRONIZADOS");	
-		
+		*/
 		
 		//INICIAR EL SIMULADOR
+		startExecution();
+		System.out.println("Emepzamos el simulador");	
 		
 		
-
+		/*
 		sp.getInputStream().close(); //limpiamos antes de cerrar para cuando se vuelva a abrir	
 		if(sp.closePort()) {
 			System.out.println("Puerto cerrado");	
@@ -98,7 +81,7 @@ public class main {
 	static void startExecution() {
         Executor executor = new Executor.Builder()
                 .setTickLimit(4000)
-                .setTimeLimit(40)
+                .setTimeLimit(60)
                 .setGhostPO(false)
                 .setPacmanPO(false)
                 .setPacmanPOvisual(false) 
@@ -111,6 +94,7 @@ public class main {
         						new HumanController(new KeyBoardInput());
         GhostController ghosts = new GhostsRandom();
         MsPacManObserver observer = new MsPacManObserver();
+       
         
         System.out.println( 
         		executor.runGame(pacMan, ghosts, 40, observer)

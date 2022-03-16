@@ -644,21 +644,30 @@ public class Executor {
         GameView gv = (visuals) ? setupGameView(pacManController, game) : null;
 
         GhostController ghostControllerCopy = ghostController.copy(ghostPO);
-
+        
+        observer.gameStarted();
+        
         while (!game.gameOver()) {
             if (tickLimit != -1 && tickLimit < game.getTotalTime()) {
                 break;
             }
             handlePeek(game);
             MOVE pacManMove = pacManController.getMove(getPacmanCopy(game), System.currentTimeMillis() + timeLimit);
-            EnumMap<GHOST,MOVE> ghostsMove = ghostControllerCopy.getMove(getGhostsCopy(game), System.currentTimeMillis() + timeLimit);
+            
+            //PacMan moves
+            observer.pacManMove(game.getPacmanLastMoveMade(), game.isJunction(game.getPacmanCurrentNodeIndex()));
+            
+            
+            //Ghosts moves
+            EnumMap<GHOST,MOVE> ghostsMove = new EnumMap<GHOST, MOVE>(GHOST.class);
+            for(GHOST g: GHOST.values())
+            	ghostsMove.put(g, game.getGhostLastMoveMade(g));
             
             EnumMap<GHOST,Boolean> ghostsJunction = new EnumMap<GHOST,Boolean>(GHOST.class);
             for(GHOST g: GHOST.values())
             	ghostsJunction.put(g, game.isJunction(game.getGhostCurrentNodeIndex(g)));
             observer.ghostsMove(ghostsMove, ghostsJunction);
             
-            observer.pacManMove(pacManMove, game.isJunction(game.getPacmanCurrentNodeIndex()));
             
             game.advanceGame(pacManMove, ghostsMove);
 

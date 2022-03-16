@@ -48,6 +48,18 @@ MESSAGE CommunicationManager::ReadMsg(){
 	return msg;
 }
 
+
+/**
+ * @brief Revisa si hay un mensaje disponible
+ * 
+ * @return true si hay un mensaje disponible
+ * @return false si no hay un mensaje disponible
+ */
+bool CommunicationManager::MsgAvailable(){
+	return miBT.available();
+}
+
+
 /**
  * @brief Espera a un mensaje de confirmación indicando que el servidor arduino
  * ha recibido correctamente un mensaje 
@@ -72,6 +84,25 @@ void CommunicationManager::Update(){
 			return;
 		}
 	}*/
+}
+
+/**
+ * @brief Esperamos hasta recibir un mensaje en concreto. Todos los mensajes
+ * que se reciban que no sean el esperado serán ignorados * 
+ * 
+ * @param msg Mensaje esperado
+ */
+void CommunicationManager::WaitForMsg(MESSAGE msg){
+	while (true)
+	{
+		if(miBT.available()){
+			MESSAGE msgAux = ReadMsg();
+			if(msgAux == msg){
+				break;
+			}
+		}
+		delay(50);
+	}
 }
 
 void CommunicationManager::SetDirectionController(DirectionController* d){

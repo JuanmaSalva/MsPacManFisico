@@ -12,6 +12,8 @@ enum MESSAGE{
 	MOTORS_INITIALIZED,
 	DIRECCTION_INITIALIZED,
 
+	START,
+
 
 	RED_LED,
 	GREEN_LED,
@@ -43,7 +45,8 @@ public:
 
 	void SendMsg(MESSAGE msg);
 	MESSAGE ReadMsg();
+	bool MsgAvailable();
 
 	void WaitApproval();
-
+	void WaitForMsg(MESSAGE msg);
 };

@@ -16,8 +16,8 @@ class DirectionController;
 #define STRIGHT_DEGREES_BUFFER 10.0
 #define MINIMUM_EXIT_TURN_TIME 250
 
-#define FULL_BRAKE_TIME 120
-#define MIN_TIME_FOR_FULL_BRAKE 1500
+#define FULL_BRAKE_TIME 130
+#define MIN_TIME_FOR_FULL_BRAKE 1600
 
 enum State{
 	followingLine,
@@ -70,6 +70,7 @@ public:
 
 	MotorsController();
 	void Init();
+	void Start();
 	void Update();
 
 	void SetLineTracker(LineTracker* _lineTracker);

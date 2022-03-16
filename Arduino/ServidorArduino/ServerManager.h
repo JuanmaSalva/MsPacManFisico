@@ -9,8 +9,12 @@ enum JAVA_MESSAGE{
 	PAC_MAN_RIGHT,
 	PAC_MAN_DOWN,
 	PAC_MAN_LEFT,
+    PAC_MAN_NEUTRAL,
 
-	JAVA_OK
+	JAVA_START,
+
+	JAVA_OK,
+	JAVA_NULL
 };
 
 
@@ -25,4 +29,6 @@ public:
 
 	void SendMsg(JAVA_MESSAGE msg);
 	JAVA_MESSAGE ReadMsg();
+
+	void WaitForMsg(JAVA_MESSAGE msg);
 };
