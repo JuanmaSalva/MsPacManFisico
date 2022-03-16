@@ -43,7 +43,7 @@ public class MsPacManObserver implements GameObserver{
 		}
 		
 		//nunca llegará aquí en teoría
-		return JAVA_MESSAGE.OK;
+		return JAVA_MESSAGE.PAC_MAN_NEUTRAL;
 	}
 
 }
