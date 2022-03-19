@@ -88,6 +88,7 @@ void MotorsController::FollowLine(){
 			analogWrite(leftSpeed, NORMAL_SPEED);
 			analogWrite(rightSpeed, NORMAL_SPEED);
 			state = followGyroscope;
+			communicationManager->SendMsg(MESSAGE::YELLOW_LED);
 			initialTime = millis();
 		}
 	}
@@ -131,7 +132,7 @@ void MotorsController::Turning(){
 		turningDirection = none;
 
 		Stop();
-		delay(100);
+		delay(200);
 		Stright(true);	
 		digitalWrite(rightSpeed, NORMAL_SPEED);
 		digitalWrite(leftSpeed, NORMAL_SPEED);
@@ -278,23 +279,24 @@ void MotorsController::NinetyGegreeTurn(){
  */
 void MotorsController::Turn(){
 	if(turningDirection == right){
-		analogWrite(leftSpeed, NORMAL_SPEED);
-		analogWrite(rightSpeed, NORMAL_SPEED);
-
 		digitalWrite(forwardLeft, LOW);
 		digitalWrite(backwardLeft, HIGH);
 		digitalWrite(forwardRight, LOW);
 		digitalWrite(backwardRight, HIGH);
 	}
 	else {
-		analogWrite(leftSpeed, NORMAL_SPEED);
-		analogWrite(rightSpeed, NORMAL_SPEED);   
-
 		digitalWrite(forwardLeft, HIGH);
 		digitalWrite(backwardLeft, LOW);
 		digitalWrite(forwardRight, HIGH);
 		digitalWrite(backwardRight, LOW);
 	}
+
+	// analogWrite(leftSpeed, 200);
+	// analogWrite(rightSpeed, 200);
+	// delay(2);
+
+	analogWrite(leftSpeed, NORMAL_SPEED);
+	analogWrite(rightSpeed, NORMAL_SPEED);
 }
 
 
