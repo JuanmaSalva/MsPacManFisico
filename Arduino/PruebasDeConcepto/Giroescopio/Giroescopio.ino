@@ -60,5 +60,6 @@ void setup() {
 }
 
 void loop() {
+  delay(500);
   mpu.dmp_read_fifo();    // funcion que evalua si existen datos nuevos en el sensor y llama
 } 

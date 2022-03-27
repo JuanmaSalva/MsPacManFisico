@@ -7,17 +7,17 @@ class GyroscopeController;
 class CommunicationManager;
 class DirectionController;
 
-#define NORMAL_SPEED 140
-#define REDUCED_SPEED 60
-#define INCREASED_SPEED 170
+#define REDUCED_SPEED 70.0
+#define NORMAL_SPEED 100.0
+#define INCREASED_SPEED 130.0
 
 
-#define TURNING_DEGREES_BUFFER 2.0
-#define STRIGHT_DEGREES_BUFFER 10.0
-#define MINIMUM_EXIT_TURN_TIME 250
+#define TURNING_DEGREES_BUFFER 1.5
+#define STRIGHT_DEGREES_BUFFER 12.5
+#define MINIMUM_EXIT_TURN_TIME 300.0
 
-#define FULL_BRAKE_TIME 130
-#define MIN_TIME_FOR_FULL_BRAKE 1600
+#define FULL_BRAKE_TIME 70.0
+#define MIN_TIME_FOR_FULL_BRAKE 750.0
 
 enum State{
 	followingLine,

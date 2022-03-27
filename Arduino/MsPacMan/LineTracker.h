@@ -18,9 +18,9 @@ enum Action {
 
 class LineTracker{
 private:
-	int SENSOR_L = 5;
+	int SENSOR_L = 7;
 	int SENSOR_C = 6;
-	int SENSOR_R = 7;
+	int SENSOR_R = 5;
 
 	Action currentAction; //action that needs to take place acorging to the readings from the sensor
 

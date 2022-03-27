@@ -660,7 +660,7 @@ public class Executor {
             
             //Ghosts moves
             EnumMap<GHOST,MOVE> ghostsMove = new EnumMap<GHOST, MOVE>(GHOST.class);
-            for(GHOST g: GHOST.values())
+            for(GHOST g : GHOST.values())
             	ghostsMove.put(g, game.getGhostLastMoveMade(g));
             
             EnumMap<GHOST,Boolean> ghostsJunction = new EnumMap<GHOST,Boolean>(GHOST.class);
