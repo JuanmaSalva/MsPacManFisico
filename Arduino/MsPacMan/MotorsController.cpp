@@ -25,7 +25,6 @@ void MotorsController::Start(){
 	Stright(true);
 	analogWrite(leftSpeed, INCREASED_SPEED);
 	analogWrite(rightSpeed, INCREASED_SPEED);
-	delay(50); //para empezar con velocidad
 	nextDirection = directionController->GetNextDirection();
 }
 
@@ -161,12 +160,12 @@ void MotorsController::TurnExit(){
 			analogWrite(rightSpeed, NORMAL_SPEED); 
 			nextDirection = directionController->GetNextDirection(); 
 		}
-		// else {
-		// 	//Si esta en linea pero aun no ha pasado suficiente tiempo mínimo, se
-		// 	//acelera más rápido para recuperar la velocidad de cricero 
-		// 	analogWrite(leftSpeed, INCREASED_SPEED);
-		// 	analogWrite(rightSpeed, INCREASED_SPEED);  
-		// }
+		else {
+			//Si esta en linea pero aun no ha pasado suficiente tiempo mínimo, se
+			//acelera más rápido para recuperar la velocidad de cricero 
+			analogWrite(leftSpeed, INCREASED_SPEED);
+			analogWrite(rightSpeed, INCREASED_SPEED);  
+		}
 	}
 	else{
 		TurningDirection overCorrectionDir = OverCorrectionDirection();
