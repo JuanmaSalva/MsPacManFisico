@@ -59,7 +59,7 @@ public class main {
 		
 
 		System.out.println("SINCRONIZADOS");	
-		
+		*/
 		
 		//INICIAR EL SIMULADOR
 		startExecution();
