@@ -87,8 +87,9 @@ void MotorsController::FollowLine(){
 			Stright(true);	
 			analogWrite(leftSpeed, NORMAL_SPEED);
 			analogWrite(rightSpeed, NORMAL_SPEED);
-			state = followGyroscope;
-			communicationManager->SendMsg(MESSAGE::YELLOW_LED);
+			state = followGyroscope;			
+			if(communicationManager != nullptr)
+				communicationManager->SendMsg(MESSAGE::YELLOW_LED);
 			initialTime = millis();
 		}
 	}
@@ -152,19 +153,20 @@ void MotorsController::TurnExit(){
 	if(CurrentDirectionOffset() < TURNING_DEGREES_BUFFER){ //si está alineado
 		if(millis() - initialTime > MINIMUM_EXIT_TURN_TIME)
 		{
-			communicationManager->SendMsg(MESSAGE::GREEN_LED);
+			if(communicationManager != nullptr)
+				communicationManager->SendMsg(MESSAGE::GREEN_LED);
 			state = followingLine;
 			initialTime = millis();
 			analogWrite(leftSpeed, NORMAL_SPEED);
 			analogWrite(rightSpeed, NORMAL_SPEED); 
 			nextDirection = directionController->GetNextDirection(); 
 		}
-		else {
-			//Si esta en linea pero aun no ha pasado suficiente tiempo mínimo, se
-			//acelera más rápido para recuperar la velocidad de cricero 
-			analogWrite(leftSpeed, INCREASED_SPEED);
-			analogWrite(rightSpeed, INCREASED_SPEED);  
-		}
+		// else {
+		// 	//Si esta en linea pero aun no ha pasado suficiente tiempo mínimo, se
+		// 	//acelera más rápido para recuperar la velocidad de cricero 
+		// 	analogWrite(leftSpeed, INCREASED_SPEED);
+		// 	analogWrite(rightSpeed, INCREASED_SPEED);  
+		// }
 	}
 	else{
 		TurningDirection overCorrectionDir = OverCorrectionDirection();
@@ -192,7 +194,8 @@ void MotorsController::FollowGyroscope(){
 	if(lineTracker->GetCurrentAction() == Action::straight ||
 	millis() - initialTime > MINIMUM_EXIT_TURN_TIME){
 		state = followingLine;
-		communicationManager->SendMsg(MESSAGE::GREEN_LED);
+		if(communicationManager != nullptr)
+			communicationManager->SendMsg(MESSAGE::GREEN_LED);
 	}
 }
 
@@ -222,15 +225,15 @@ void MotorsController::Stright(bool forwards){
  * @brief Encargado de invertir la dirección de los motors para frenar exactamente incuma de la interseccion 
  */
 void MotorsController::Braking(){
-	Stright(false);	
-	digitalWrite(rightSpeed, NORMAL_SPEED);
-	digitalWrite(leftSpeed, NORMAL_SPEED);
-	delay(GetBrakingTime());
+	delay(250);
+	//Stright(false);	
+	//digitalWrite(rightSpeed, NORMAL_SPEED);
+	//digitalWrite(leftSpeed, NORMAL_SPEED);
+	//delay(GetBrakingTime());
 	Stop();
 	delay(250);
 
 	state = turning;
-	//communicationManager->SendMsg(MESSAGE::BLUE_LED);
 	initialTurningYaw = gyroscopeController->GetAdverageYaw();
 	
 	if(turningDirection == TurningDirection::left)
@@ -268,11 +271,13 @@ void MotorsController::Stop(){
 /**
  * @brief Empieza a realizar un giro de 90 grados
  */
-void MotorsController::NinetyGegreeTurn(){
-	communicationManager->SendMsg(MESSAGE::RED_LED);
+void MotorsController::NinetyGegreeTurn(){	
+	if(communicationManager != nullptr)
+		communicationManager->SendMsg(MESSAGE::RED_LED);
 	Stop();
 	state = braking;
 }
+
 
 /**
  * @brief Establece los motores en direcciones inversas para realizar un giro
@@ -291,15 +296,14 @@ void MotorsController::Turn(){
 		digitalWrite(backwardRight, LOW);
 	}
 
-	// analogWrite(leftSpeed, 200);
-	// analogWrite(rightSpeed, 200);
-	// delay(2);
+	// //para darle un impuslo inicial y que las ruedas no se queden paradas
+	// analogWrite(leftSpeed, 255);
+	// analogWrite(rightSpeed, 255);
+	// delay(5);
 
 	analogWrite(leftSpeed, NORMAL_SPEED);
 	analogWrite(rightSpeed, NORMAL_SPEED);
 }
-
-
 
 
 /**
@@ -319,6 +323,7 @@ float MotorsController::CurrentDirectionOffset(){
 	else
 		return abs(angleModule - gyroscopeController->GetCurrentYaw());	
 }
+
 
 /**
  * @brief Devuelve la dirección hacia la que el robot tiene que sobre-corregir tras realizar un giro de 90 grados * 
@@ -353,16 +358,6 @@ void MotorsController::AplyOverCorrection(TurningDirection dir){
 	}
 }
 
-// void MotorsController::LocalDelay(int time){
-// 	communicationManager->SendMsg(MESSAGE::YELLOW_LED);
-
-// 	long init = millis();
-
-// 	while(millis() - init < time)
-// 	;
-
-// 	communicationManager->SendMsg(MESSAGE::MAGENTA_LED);
-// }
 
 void MotorsController::SetLineTracker(LineTracker* _lineTracker){
 	lineTracker = _lineTracker;

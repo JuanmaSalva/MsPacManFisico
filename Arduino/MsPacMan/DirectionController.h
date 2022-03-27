@@ -3,14 +3,9 @@
 
 class DirectionController{
 private:
-	TurningDirection turningDirections[16] = {TurningDirection::none, TurningDirection::none, 
-												TurningDirection::none, TurningDirection::none,
-												TurningDirection::left, TurningDirection::left,
-												TurningDirection::none, TurningDirection::none,
-												TurningDirection::none, TurningDirection::none,
-												TurningDirection::left, TurningDirection::left,
-												TurningDirection::none, TurningDirection::none,
-												TurningDirection::none, TurningDirection::none};
+	TurningDirection turningDirections[5] = {TurningDirection::left, TurningDirection::left, 
+												TurningDirection::left, TurningDirection::none,
+												TurningDirection::left};
 	int currentInstruction;
 
 public:
