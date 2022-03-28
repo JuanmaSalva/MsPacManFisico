@@ -23,9 +23,9 @@ void MotorsController::Init(){
 
 void MotorsController::Start(){
 	Stright(true);
-	analogWrite(leftSpeed, INCREASED_SPEED);
-	analogWrite(rightSpeed, INCREASED_SPEED);
+
 	nextDirection = directionController->GetNextDirection();
+	timeSinceLastTurn = millis();
 }
 
 void MotorsController::Update(){
@@ -67,10 +67,6 @@ void MotorsController::FollowLine(){
 			TurningDirection overCorrectionDir = OverCorrectionDirection();
 			AplyOverCorrection(overCorrectionDir);		
 		}
-		else {
-			analogWrite(leftSpeed, NORMAL_SPEED);
-			analogWrite(rightSpeed, NORMAL_SPEED);
-		}
 	}
 	else if(currentAction == turn){ //Giro 90 grados
 		if(nextDirection == TurningDirection::left){
@@ -84,12 +80,11 @@ void MotorsController::FollowLine(){
 		else{
 			nextDirection = directionController->GetNextDirection();
 			Stright(true);	
-			analogWrite(leftSpeed, NORMAL_SPEED);
-			analogWrite(rightSpeed, NORMAL_SPEED);
 			state = followGyroscope;			
+			timeReachedIntersecction = millis();
+
 			if(communicationManager != nullptr)
 				communicationManager->SendMsg(MESSAGE::YELLOW_LED);
-			initialTime = millis();
 		}
 	}
 	else if (currentAction == leftCorrection) { //desvio derecha
@@ -128,16 +123,14 @@ void MotorsController::Turning(){
 	if(abs((perfectAngle % 360) - gyroscopeController->GetCurrentYaw()) < TURNING_DEGREES_BUFFER){
 		turningDirection = (turningDirection == right) ? left: right;
 		Turn();
-		delay(100);
+		delay(20);
 		turningDirection = none;
 
 		Stop();
 		delay(200);
 		Stright(true);	
-		digitalWrite(rightSpeed, NORMAL_SPEED);
-		digitalWrite(leftSpeed, NORMAL_SPEED);
 		state = turnExit;
-		initialTime = millis();
+		timeExitIntersecction = millis();
 		gyroscopeController->ResetYaw();
 	}
 }
@@ -150,19 +143,17 @@ void MotorsController::TurnExit(){
 	Stright(true);
 	
 	if(CurrentDirectionOffset() < TURNING_DEGREES_BUFFER){ //si está alineado
-		if(millis() - initialTime > MINIMUM_EXIT_TURN_TIME)
+		if(millis() - timeExitIntersecction > MINIMUM_EXIT_TURN_TIME)
 		{
 			if(communicationManager != nullptr)
 				communicationManager->SendMsg(MESSAGE::GREEN_LED);
 			state = followingLine;
-			initialTime = millis();
-			analogWrite(leftSpeed, NORMAL_SPEED);
-			analogWrite(rightSpeed, NORMAL_SPEED); 
+			timeSinceLastTurn = millis();
 			nextDirection = directionController->GetNextDirection(); 
 		}
 		else {
 			//Si esta en linea pero aun no ha pasado suficiente tiempo mínimo, se
-			//acelera más rápido para recuperar la velocidad de cricero 
+			//acelera más rápido para recuperar la velocidad de crucero 
 			analogWrite(leftSpeed, INCREASED_SPEED);
 			analogWrite(rightSpeed, INCREASED_SPEED);  
 		}
@@ -184,14 +175,12 @@ void MotorsController::FollowGyroscope(){
 	}
 	else{
 		Stright(true);
-		analogWrite(leftSpeed, NORMAL_SPEED);
-		analogWrite(rightSpeed, NORMAL_SPEED);
 	}
 
 	//hemos salido de la zona de la interseccion (zona negra) y los sensores ya detectan
 	//los carriles. Ya se puede volver al control normal
 	if(lineTracker->GetCurrentAction() == Action::straight ||
-	millis() - initialTime > MINIMUM_EXIT_TURN_TIME){
+	millis() - timeReachedIntersecction > MINIMUM_EXIT_TURN_TIME){
 		state = followingLine;
 		if(communicationManager != nullptr)
 			communicationManager->SendMsg(MESSAGE::GREEN_LED);
@@ -217,6 +206,10 @@ void MotorsController::Stright(bool forwards){
 		digitalWrite(forwardRight, LOW);
 		digitalWrite(backwardRight, HIGH);
 	}
+
+
+	analogWrite(rightSpeed, NORMAL_SPEED);
+	analogWrite(leftSpeed, NORMAL_SPEED);
 }
 
 
@@ -224,11 +217,9 @@ void MotorsController::Stright(bool forwards){
  * @brief Encargado de invertir la dirección de los motors para frenar exactamente incuma de la interseccion 
  */
 void MotorsController::Braking(){
-	delay(250);
-	//Stright(false);	
-	//digitalWrite(rightSpeed, NORMAL_SPEED);
-	//digitalWrite(leftSpeed, NORMAL_SPEED);
-	//delay(GetBrakingTime());
+	delay(TIME_TO_START_BRAKING);
+	Stright(false);	
+	delay(GetBrakingTime());
 	Stop();
 	delay(250);
 
@@ -246,11 +237,11 @@ void MotorsController::Braking(){
 
 
 int MotorsController::GetBrakingTime(){
-	if(millis() - initialTime > MIN_TIME_FOR_FULL_BRAKE){
+	if(millis() - timeSinceLastTurn > MIN_TIME_FOR_FULL_BRAKE){
 		return FULL_BRAKE_TIME;
 	}
 	else{
-		return ((millis() - initialTime) * FULL_BRAKE_TIME) / MIN_TIME_FOR_FULL_BRAKE;
+		return ((millis() - timeSinceLastTurn) * FULL_BRAKE_TIME) / MIN_TIME_FOR_FULL_BRAKE;
 	}
 	return FULL_BRAKE_TIME;
 }
@@ -273,7 +264,6 @@ void MotorsController::Stop(){
 void MotorsController::NinetyGegreeTurn(){	
 	if(communicationManager != nullptr)
 		communicationManager->SendMsg(MESSAGE::RED_LED);
-	Stop();
 	state = braking;
 }
 
@@ -294,11 +284,6 @@ void MotorsController::Turn(){
 		digitalWrite(forwardRight, HIGH);
 		digitalWrite(backwardRight, LOW);
 	}
-
-	// //para darle un impuslo inicial y que las ruedas no se queden paradas
-	// analogWrite(leftSpeed, 255);
-	// analogWrite(rightSpeed, 255);
-	// delay(5);
 
 	analogWrite(leftSpeed, NORMAL_SPEED);
 	analogWrite(rightSpeed, NORMAL_SPEED);
@@ -343,6 +328,8 @@ TurningDirection MotorsController::OverCorrectionDirection(){
  * @param dir dirección a la que tenemos que sobrecorregir
  */
 void MotorsController::AplyOverCorrection(TurningDirection dir){
+	Stright(true);
+
 	if(dir == left){
 		analogWrite(leftSpeed, REDUCED_SPEED);
 		analogWrite(rightSpeed, INCREASED_SPEED);
@@ -350,10 +337,6 @@ void MotorsController::AplyOverCorrection(TurningDirection dir){
 	else if (dir == right){
 		analogWrite(leftSpeed, INCREASED_SPEED);
 		analogWrite(rightSpeed, REDUCED_SPEED);
-	}
-	else { //no deberia de llegar aquí nunca
-		analogWrite(leftSpeed, NORMAL_SPEED);
-		analogWrite(rightSpeed, NORMAL_SPEED);
 	}
 }
 

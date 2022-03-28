@@ -67,7 +67,7 @@ void GyroscopeController::Init(){
 
 void GyroscopeController::Update(){
 	myMpu.dmp_read_fifo();
-	Serial.println(currentYaw);
+	//Serial.println(currentYaw);
 
 	if(targetYaw % 360 == 0){
 		if(currentYaw > 180)
