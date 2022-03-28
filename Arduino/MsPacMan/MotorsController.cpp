@@ -139,10 +139,10 @@ void MotorsController::Turning(){
  * @brief Encargado de dirigir el robot los instantes posteriores a un giro
  * Encargado tambien de sobrecorregirlo para salir en la dirección correcta
  */
-void MotorsController::TurnExit(){
+void MotorsController::TurnExit(){	
 	Stright(true);
 	
-	if(CurrentDirectionOffset() < TURNING_DEGREES_BUFFER){ //si está alineado
+	if(CurrentDirectionOffset() < EXIT_TURN_BUFFER){ //si está alineado
 		if(millis() - timeExitIntersecction > MINIMUM_EXIT_TURN_TIME)
 		{
 			if(communicationManager != nullptr)
@@ -150,6 +150,8 @@ void MotorsController::TurnExit(){
 			state = followingLine;
 			timeSinceLastTurn = millis();
 			nextDirection = directionController->GetNextDirection(); 
+			analogWrite(rightSpeed, NORMAL_SPEED);
+			analogWrite(leftSpeed, NORMAL_SPEED);
 		}
 		else {
 			//Si esta en linea pero aun no ha pasado suficiente tiempo mínimo, se
@@ -315,10 +317,19 @@ float MotorsController::CurrentDirectionOffset(){
  */
 TurningDirection MotorsController::OverCorrectionDirection(){
 	float aux = gyroscopeController->GetCurrentYaw(); 
-	if(aux < (perfectAngle % 360))
-		return right;
-	else 
-		return left;
+
+	if(perfectAngle % 360 == 0){
+		if(aux < 180)
+			return left;
+		else
+			return right;
+	}
+	else{
+		if(aux < (perfectAngle % 360))
+			return right;
+		else 
+			return left;
+	}
 }
 
 
