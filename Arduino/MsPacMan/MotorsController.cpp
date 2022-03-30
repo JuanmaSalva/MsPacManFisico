@@ -175,7 +175,10 @@ void MotorsController::FollowGyroscope(){
 	AplyOverCorrection(overCorrectionDir);
 
 	
-	if(millis() - timeReachedIntersecction > 100){
+	//hemos salido de la zona de la interseccion (zona negra) y los sensores ya detectan
+	//los carriles. Ya se puede volver al control normal
+	if(lineTracker->GetCurrentAction() == Action::straight ||
+	millis() - timeReachedIntersecction > MINIMUM_EXIT_TURN_TIME){
 		state = followingLine;
 		if(communicationManager != nullptr)
 			communicationManager->SendMsg(MESSAGE::GREEN_LED);
