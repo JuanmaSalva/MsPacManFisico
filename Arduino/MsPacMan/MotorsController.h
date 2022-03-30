@@ -17,7 +17,7 @@ class DirectionController;
 #define EXIT_TURN_BUFFER 5.0
 
 #define MINIMUM_EXIT_TURN_TIME 300.0
-#define TIME_TO_START_BRAKING 80.0
+#define TIME_TO_START_BRAKING 100.0
 #define FULL_BRAKE_TIME 70.0
 #define MIN_TIME_FOR_FULL_BRAKE 750.0
 

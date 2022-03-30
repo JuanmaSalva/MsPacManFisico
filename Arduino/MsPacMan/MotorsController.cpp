@@ -171,18 +171,11 @@ void MotorsController::TurnExit(){
  * recibidos por el giroscopio 
  */
 void MotorsController::FollowGyroscope(){
-	if(CurrentDirectionOffset() > TURNING_DEGREES_BUFFER){
-		TurningDirection overCorrectionDir = OverCorrectionDirection();
-		AplyOverCorrection(overCorrectionDir);
-	}
-	else{
-		Stright(true);
-	}
+	TurningDirection overCorrectionDir = OverCorrectionDirection();
+	AplyOverCorrection(overCorrectionDir);
 
-	//hemos salido de la zona de la interseccion (zona negra) y los sensores ya detectan
-	//los carriles. Ya se puede volver al control normal
-	if(lineTracker->GetCurrentAction() == Action::straight ||
-	millis() - timeReachedIntersecction > MINIMUM_EXIT_TURN_TIME){
+	
+	if(millis() - timeReachedIntersecction > 100){
 		state = followingLine;
 		if(communicationManager != nullptr)
 			communicationManager->SendMsg(MESSAGE::GREEN_LED);
@@ -320,9 +313,9 @@ TurningDirection MotorsController::OverCorrectionDirection(){
 
 	if(perfectAngle % 360 == 0){
 		if(aux < 180)
-			return left;
-		else
 			return right;
+		else
+			return left;
 	}
 	else{
 		if(aux < (perfectAngle % 360))
