@@ -71,7 +71,7 @@ void GyroscopeController::Update(){
 
 	if(targetYaw % 360 == 0){
 		if(currentYaw > 180)
-			acumulatedYaw += (currentYaw - 360);
+			acumulatedYaw += (360 - currentYaw);
 		else     
 			acumulatedYaw += currentYaw;
 	}

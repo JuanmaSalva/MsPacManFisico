@@ -120,7 +120,7 @@ void MotorsController::FollowLine(){
  * @brief Controla el giro, encargado de pararlo cuando es necesario 
  */
 void MotorsController::Turning(){
-	if(abs((perfectAngle % 360) - gyroscopeController->GetCurrentYaw()) < TURNING_DEGREES_BUFFER){
+	if(CurrentDirectionOffset() < TURNING_DEGREES_BUFFER){
 		turningDirection = (turningDirection == right) ? left: right;
 		Turn();
 		delay(20);
@@ -229,6 +229,7 @@ void MotorsController::Braking(){
 	else if(turningDirection == TurningDirection::right)
 		perfectAngle += 90;
 
+	perfectAngle = perfectAngle % 360;
 	gyroscopeController->SetTargetYaw(perfectAngle);
 	Turn();
 }
@@ -294,16 +295,14 @@ void MotorsController::Turn(){
  * @return desviacion en grados positivos
  */
 float MotorsController::CurrentDirectionOffset(){
-	int angleModule = perfectAngle % 360;
-
-	if(angleModule == 0){
+	if(perfectAngle == 0){
 		if(gyroscopeController->GetCurrentYaw() < 180)
 			return gyroscopeController->GetCurrentYaw();
 		else
 			return 360 - gyroscopeController->GetCurrentYaw();
 	}
 	else
-		return abs(angleModule - gyroscopeController->GetCurrentYaw());	
+		return abs(perfectAngle - gyroscopeController->GetCurrentYaw());	
 }
 
 
@@ -314,14 +313,14 @@ float MotorsController::CurrentDirectionOffset(){
 TurningDirection MotorsController::OverCorrectionDirection(){
 	float aux = gyroscopeController->GetCurrentYaw(); 
 
-	if(perfectAngle % 360 == 0){
+	if(perfectAngle == 0){
 		if(aux < 180)
-			return right;
-		else
 			return left;
+		else
+			return right;
 	}
 	else{
-		if(aux < (perfectAngle % 360))
+		if(aux < perfectAngle)
 			return right;
 		else 
 			return left;
