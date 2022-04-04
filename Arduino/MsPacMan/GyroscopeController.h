@@ -27,6 +27,8 @@ public:
 
 	void Init();
 	void Update();
+
+	void UpdateAdverageYaw();
 	float GetCurrentYaw();
 	float GetAdverageYaw();
 	void ResetYaw();

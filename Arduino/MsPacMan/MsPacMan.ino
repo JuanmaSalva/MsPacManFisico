@@ -12,6 +12,8 @@ DirectionController* directionController;
 
 
 void setup() {
+	Serial.begin(9600);
+
 	//Communication Manager
 	// communicationManager = new CommunicationManager();
 	// communicationManager->Init();
@@ -56,8 +58,8 @@ void setup() {
 
 
 void loop() {
-	lineTracker->Update();
+	//lineTracker->Update();
 	gyroscopeController->Update();
-	motorsController->Update();
+	//motorsController->Update();
 	//communicationManager->Update();	
 }

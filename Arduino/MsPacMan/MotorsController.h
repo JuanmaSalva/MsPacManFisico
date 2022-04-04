@@ -19,7 +19,7 @@ class DirectionController;
 #define MINIMUM_EXIT_TURN_TIME 300.0
 #define TIME_TO_START_BRAKING 75.0
 #define FULL_BRAKE_TIME 70.0
-#define MIN_TIME_FOR_FULL_BRAKE 15.0
+#define MIN_TIME_FOR_FULL_BRAKE 10 //TODO esto a lo mejor ya no tiene sentido
 
 enum State{
 	followingLine,
@@ -45,7 +45,6 @@ private:
 	DirectionController* directionController;
 
 	State state;
-	float initialTurningYaw;
 	TurningDirection turningDirection;
 	TurningDirection nextDirection = TurningDirection::none;
 	int perfectAngle; //el ángluo que deberia llevar el robot en relacion a la posicion de inicio

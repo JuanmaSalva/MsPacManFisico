@@ -166,13 +166,16 @@ void MotorsController::TurnExit(){
 	}
 }
 
+
 /**
  * @brief Encargado de dirigir el robot guiandose únicamente por los datos 
  * recibidos por el giroscopio 
  */
 void MotorsController::FollowGyroscope(){
-	TurningDirection overCorrectionDir = OverCorrectionDirection();
-	AplyOverCorrection(overCorrectionDir);
+	if(CurrentDirectionOffset() >= STRIGHT_DEGREES_BUFFER){
+		TurningDirection overCorrectionDir = OverCorrectionDirection();
+		AplyOverCorrection(overCorrectionDir);
+	}
 
 	
 	//hemos salido de la zona de la interseccion (zona negra) y los sensores ya detectan
@@ -222,7 +225,6 @@ void MotorsController::Braking(){
 	delay(250);
 
 	state = turning;
-	initialTurningYaw = gyroscopeController->GetAdverageYaw();
 	
 	if(turningDirection == TurningDirection::left)
 		perfectAngle += 270;
