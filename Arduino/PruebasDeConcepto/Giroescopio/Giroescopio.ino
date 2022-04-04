@@ -1,11 +1,17 @@
-#include "Simple_MPU6050.h"
+#include "Simple_MPU6050.h"          // incluye libreria Simple_MPU6050
 #define MPU6050_ADDRESS_AD0_LOW     0x68      // direccion I2C con AD0 en LOW o sin conexion
 #define MPU6050_ADDRESS_AD0_HIGH    0x69      // direccion I2C con AD0 en HIGH
 #define MPU6050_DEFAULT_ADDRESS     MPU6050_ADDRESS_AD0_LOW // por defecto AD0 en LOW
 
-Simple_MPU6050 mpu;
 
-//#define OFFSETS  -5114,     484,    1030,      46,     -14,       6  // Colocar valores personalizados
+#define DRIFT 20.0
+float currentYaw = 0;
+float previousYaw = 0;
+
+Simple_MPU6050 mpu;       // crea objeto con nombre mpu
+// ENABLE_MPU_OVERFLOW_PROTECTION();    // activa proteccion, ya no se requiere
+
+// #define OFFSETS  -5114,     484,    1030,      46,     -14,       6  // Colocar valores personalizados
 
 #define spamtimer(t) for (static uint32_t SpamTimer; (uint32_t)(millis() - SpamTimer) >= (t); SpamTimer = millis())
 // spamtimer funcion para generar demora al escribir en monitor serie sin usar delay()
@@ -25,9 +31,21 @@ void mostrar_valores (int16_t *gyro, int16_t *accel, int32_t *quat, uint32_t *ti
     mpu.GetGravity(&gravity, &q);   // funcion para obtener valor para calculo posterior
     mpu.GetYawPitchRoll(ypr, &q, &gravity); // funcion obtiene valores de yaw, ptich, roll
     mpu.ConvertToDegrees(ypr, xyz);   // funcion convierte a grados sexagesimales
-    Serial.printfloatx(F("Yaw")  , xyz[0], 9, 4, F(",   "));  // muestra en monitor serie rotacion de eje Z, yaw
-    Serial.printfloatx(F("Pitch"), xyz[1], 9, 4, F(",   "));  // muestra en monitor serie rotacion de eje Y, pitch
-    Serial.printfloatx(F("Roll") , xyz[2], 9, 4, F(",   "));  // muestra en monitor serie rotacion de eje X, roll
+
+    float delta = previousYaw - xyz[0];
+    currentYaw = currentYaw - delta;
+    
+    float actualDrift = (delta * DRIFT) / 360;
+    currentYaw = currentYaw - actualDrift;      
+    
+    previousYaw = xyz[0];
+    Serial.printfloatx(F("Yaw")  , currentYaw , 9, 4, F(",   "));  // muestra en monitor serie rotacion de eje Z, yaw
+    
+    //Serial.printfloatx(F("Yaw")  , xyz[0] , 9, 4, F(",   "));  // muestra en monitor serie rotacion de eje Z, yaw
+    //Serial.printfloatx(F("Pitch"), xyz[1], 9, 4, F(",   "));  // muestra en monitor serie rotacion de eje Y, pitch
+    //Serial.printfloatx(F("Roll") , xyz[2], 9, 4, F(",   "));  // muestra en monitor serie rotacion de eje X, roll
+    
+    
     Serial.println();       // salto de linea
   }
 }
@@ -41,7 +59,7 @@ void setup() {
   Fastwire::setup(400, true);
 #endif
   
-  Serial.begin(9600);     // inicializacion de monitor serie a 115200 bps
+  Serial.begin(115200);     // inicializacion de monitor serie a 115200 bps
   while (!Serial);      // espera a enumeracion en caso de modelos con USB nativo
   Serial.println(F("Inicio:"));   // muestra texto estatico
 #ifdef OFFSETS                // si existen OFFSETS
@@ -52,14 +70,12 @@ void setup() {
   Serial.println(F(" No se establecieron Offsets, haremos unos nuevos.\n" // muestra texto estatico
                    " Colocar el sensor en un superficie plana y esperar unos segundos\n"
                    " Colocar los nuevos Offsets en #define OFFSETS\n"
-                   " para saltar la calibracion inicial \n"
-                   " \t\tPresionar cualquier tecla y ENTER"));
+                   " para saltar la calibracion inicial \n"));
   mpu.SetAddress(MPU6050_ADDRESS_AD0_LOW).CalibrateMPU().load_DMP_Image();  // inicializacion de sensor
 #endif
   mpu.on_FIFO(mostrar_valores);   // llamado a funcion mostrar_valores si memoria FIFO tiene valores
 }
 
 void loop() {
-  delay(500);
   mpu.dmp_read_fifo();    // funcion que evalua si existen datos nuevos en el sensor y llama
 } 

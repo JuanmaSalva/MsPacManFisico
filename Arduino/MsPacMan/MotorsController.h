@@ -12,12 +12,14 @@ class DirectionController;
 #define INCREASED_SPEED 130.0
 
 
-#define TURNING_DEGREES_BUFFER 1.5
-#define STRIGHT_DEGREES_BUFFER 12.5
-#define MINIMUM_EXIT_TURN_TIME 300.0
+#define TURNING_DEGREES_BUFFER 0.5
+#define STRIGHT_DEGREES_BUFFER 10.0
+#define EXIT_TURN_BUFFER 5.0
 
+#define MINIMUM_EXIT_TURN_TIME 300.0
+#define TIME_TO_START_BRAKING 75.0
 #define FULL_BRAKE_TIME 70.0
-#define MIN_TIME_FOR_FULL_BRAKE 750.0
+#define MIN_TIME_FOR_FULL_BRAKE 10 //TODO esto a lo mejor ya no tiene sentido
 
 enum State{
 	followingLine,
@@ -43,12 +45,14 @@ private:
 	DirectionController* directionController;
 
 	State state;
-	float initialTurningYaw;
 	TurningDirection turningDirection;
 	TurningDirection nextDirection = TurningDirection::none;
-	long initialTime;
 	int perfectAngle; //el ángluo que deberia llevar el robot en relacion a la posicion de inicio
 
+	//Variables relacionadas con el manejo de tiempos
+	long timeReachedIntersecction;
+	long timeSinceLastTurn;
+	long timeExitIntersecction;
 
 	void NinetyGegreeTurn();
 
