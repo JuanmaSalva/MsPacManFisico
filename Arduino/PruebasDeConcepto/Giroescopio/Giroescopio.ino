@@ -57,9 +57,14 @@ void anguloReal(float driftedYaw){
 
     currentYaw += delta;
 
-    currentYaw = fmod(currentYaw, 360.0);
-    float positiveCurrentYaw = abs(currentYaw);
-    Serial.print(positiveCurrentYaw);
+    //currentYaw = fmod(currentYaw, 360.0);
+    if(currentYaw < -180.0)
+      currentYaw = 360 + currentYaw;
+    else if(currentYaw > 180)
+      currentYaw = currentYaw - 360;
+      
+    
+    Serial.print(currentYaw);
 
     previousYaw = driftedYaw;
 }

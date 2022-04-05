@@ -58,8 +58,8 @@ void setup() {
 
 
 void loop() {
-	//lineTracker->Update();
+	lineTracker->Update();
 	gyroscopeController->Update();
-	//motorsController->Update();
-	//communicationManager->Update();	
+	motorsController->Update();
+	communicationManager->Update();	
 }

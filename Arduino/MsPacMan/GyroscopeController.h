@@ -13,7 +13,6 @@
 #define printfloatx(Name,Variable,Spaces,Precision,EndTxt) print(Name); {char S[(Spaces + Precision + 3)];Serial.print(F(" ")); Serial.print(dtostrf((float)Variable,Spaces,Precision ,S));}Serial.print(EndTxt);
 // printfloatx funcion para mostrar en monitor serie datos para evitar el uso se multiples print()
 
-
 class GyroscopeController{
 private:
 	float adverageYaw;
