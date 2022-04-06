@@ -4,7 +4,7 @@
 #define MPU6050_DEFAULT_ADDRESS     MPU6050_ADDRESS_AD0_LOW // por defecto AD0 en LOW
 
 
-#define DRIFT 20.0
+#define DRIFT 5.0
 float currentYaw = 0;
 float previousYaw = 0;
 
@@ -32,15 +32,14 @@ void mostrar_valores (int16_t *gyro, int16_t *accel, int32_t *quat, uint32_t *ti
     mpu.GetYawPitchRoll(ypr, &q, &gravity); // funcion obtiene valores de yaw, ptich, roll
     mpu.ConvertToDegrees(ypr, xyz);   // funcion convierte a grados sexagesimales
 
-    float delta = previousYaw - xyz[0];
-    currentYaw = currentYaw - delta;
-    
-    float actualDrift = (delta * DRIFT) / 360;
-    currentYaw = currentYaw - actualDrift;      
-    
-    previousYaw = xyz[0];
-    Serial.printfloatx(F("Yaw")  , currentYaw , 9, 4, F(",   "));  // muestra en monitor serie rotacion de eje Z, yaw
-    
+    float driftedYaw = 0;
+    if(xyz[0] < 0)
+      driftedYaw = 360 + xyz[0];
+    else 
+      driftedYaw = xyz[0];
+
+    anguloReal(driftedYaw);
+
     //Serial.printfloatx(F("Yaw")  , xyz[0] , 9, 4, F(",   "));  // muestra en monitor serie rotacion de eje Z, yaw
     //Serial.printfloatx(F("Pitch"), xyz[1], 9, 4, F(",   "));  // muestra en monitor serie rotacion de eje Y, pitch
     //Serial.printfloatx(F("Roll") , xyz[2], 9, 4, F(",   "));  // muestra en monitor serie rotacion de eje X, roll
@@ -49,6 +48,42 @@ void mostrar_valores (int16_t *gyro, int16_t *accel, int32_t *quat, uint32_t *ti
     Serial.println();       // salto de linea
   }
 }
+
+
+void anguloReal(float driftedYaw){
+    
+    //Serial.printfloatx(F("Yaw")  , driftedYaw, 9, 4, F(",   "));
+    float delta = getDelta(driftedYaw);
+
+    currentYaw += delta;
+
+    //currentYaw = fmod(currentYaw, 360.0);
+    if(currentYaw < -180.0)
+      currentYaw = 360 + currentYaw;
+    else if(currentYaw > 180)
+      currentYaw = currentYaw - 360;
+      
+    
+    Serial.print(currentYaw);
+
+    previousYaw = driftedYaw;
+}
+
+float getDelta(float driftedYaw){
+    //drifed delta
+    float delta = (driftedYaw - previousYaw);
+    if(delta > 300) delta -= 360;
+    else if (delta < -300) delta += 360;
+
+    //undrif delta
+    float aux = (delta * DRIFT) / 360.0;
+    delta -= aux;
+
+    return delta;
+}
+
+
+
 
 void setup() {
   uint8_t val;

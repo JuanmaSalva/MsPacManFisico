@@ -12,7 +12,7 @@ class DirectionController;
 #define INCREASED_SPEED 130.0
 
 
-#define TURNING_DEGREES_BUFFER 0.5
+#define TURNING_DEGREES_BUFFER 3.0
 #define STRIGHT_DEGREES_BUFFER 10.0
 #define EXIT_TURN_BUFFER 5.0
 
