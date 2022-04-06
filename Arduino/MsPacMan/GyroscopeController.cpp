@@ -1,7 +1,7 @@
 #include "GyroscopeController.h"
 
 Simple_MPU6050 myMpu;
-#define DRIFT 0.0
+#define DRIFT 4.0
 float currentYaw = 0;
 float previousYaw = 0;
 float positiveCurrentYaw;
@@ -19,7 +19,7 @@ float GetDelta(float driftedYaw){
 
     //undrif delta
     float aux = (delta * DRIFT) / 360.0;
-    delta += aux;
+    delta -= aux;
 
     return delta;
 }

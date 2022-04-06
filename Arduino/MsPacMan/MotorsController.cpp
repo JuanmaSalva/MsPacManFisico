@@ -123,7 +123,7 @@ void MotorsController::Turning(){
 	if(CurrentDirectionOffset() < TURNING_DEGREES_BUFFER){
 		turningDirection = (turningDirection == right) ? left: right;
 		Turn();
-		delay(20);
+		delay(30);
 		turningDirection = none;
 
 		Stop();
@@ -304,7 +304,7 @@ float MotorsController::CurrentDirectionOffset(){
 			return 360 - gyroscopeController->GetCurrentYaw();
 	}
 	else
-		return abs(perfectAngle - gyroscopeController->GetCurrentYaw());	
+		return abs(gyroscopeController->GetCurrentYaw() - perfectAngle);	
 }
 
 
