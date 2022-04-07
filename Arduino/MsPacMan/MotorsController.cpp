@@ -123,7 +123,7 @@ void MotorsController::Turning(){
 	if(CurrentDirectionOffset() < TURNING_DEGREES_BUFFER){
 		turningDirection = (turningDirection == right) ? left: right;
 		Turn();
-		delay(30);
+		delay(35);
 		turningDirection = none;
 
 		Stop();
