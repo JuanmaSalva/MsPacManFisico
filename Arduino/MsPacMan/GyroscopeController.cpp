@@ -1,7 +1,7 @@
 #include "GyroscopeController.h"
 
 Simple_MPU6050 myMpu;
-#define DRIFT 4.0
+#define DRIFT 3.0
 float currentYaw = 0;
 float previousYaw = 0;
 float positiveCurrentYaw;
@@ -63,13 +63,18 @@ void ShowValues(int16_t *gyro, int16_t *accel, int32_t *quat, uint32_t *timestam
 	myMpu.GetYawPitchRoll(ypr, &q, &gravity);
 	myMpu.ConvertToDegrees(ypr, xyz);
 	
-	float driftedYaw = 0;
+	if(xyz[0] < 0)
+		positiveCurrentYaw = 360 + xyz[0];
+	else 
+		positiveCurrentYaw = xyz[0];
+
+	/*float driftedYaw = 0;
 	if(xyz[0] < 0)
 		driftedYaw = 360 + xyz[0];
 	else 
 		driftedYaw = xyz[0];
 
-	positiveCurrentYaw = CalculateRealAngle(driftedYaw);
+	positiveCurrentYaw = CalculateRealAngle(driftedYaw);*/
 }
 
 

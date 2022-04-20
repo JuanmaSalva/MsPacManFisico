@@ -7,17 +7,15 @@ class GyroscopeController;
 class CommunicationManager;
 class DirectionController;
 
-#define REDUCED_SPEED 75.0
-#define NORMAL_SPEED 100.0
-#define INCREASED_SPEED 130.0
+#define REDUCED_SPEED 85.0
+#define NORMAL_SPEED 90.0
+#define INCREASED_SPEED 95.0
 
 
-#define TURNING_DEGREES_BUFFER 3.0
-#define STRIGHT_DEGREES_BUFFER 10.0
+#define TURNING_DEGREES_BUFFER 5.0
 #define EXIT_TURN_BUFFER 5.0
 
-#define MINIMUM_EXIT_TURN_TIME 300.0
-#define TIME_TO_START_BRAKING 70.0
+#define MINIMUM_EXIT_TURN_TIME 400.0
 #define FULL_BRAKE_TIME 65.0
 #define MIN_TIME_FOR_FULL_BRAKE 750 //TODO esto a lo mejor ya no tiene sentido
 
@@ -60,7 +58,6 @@ private:
 	void Turning();
 	void TurnExit();
 	void FollowGyroscope();
-	void Braking();
 	
 	void Turn();
 	TurningDirection OverCorrectionDirection();
