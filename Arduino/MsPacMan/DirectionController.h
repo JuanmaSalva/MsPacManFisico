@@ -38,4 +38,11 @@ TurningDirection::right, TurningDirection::right,
 TurningDirection::none, TurningDirection::none,
 TurningDirection::none, TurningDirection::right
 
+
+	TurningDirection::left, TurningDirection::none,
+	TurningDirection::right, TurningDirection::none,
+	TurningDirection::right, TurningDirection::right,
+	TurningDirection::none, TurningDirection::none,
+	TurningDirection::none, TurningDirection::left,
+	TurningDirection::left
 */

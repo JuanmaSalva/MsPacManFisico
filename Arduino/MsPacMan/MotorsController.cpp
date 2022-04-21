@@ -62,6 +62,8 @@ void MotorsController::FollowLine(){
 		Stright(true);
 	}
 	else if(currentAction == turn){ //Giro 90 grados
+		timeReachedIntersecction = millis();
+
 		if(nextDirection == TurningDirection::left){
 			turningDirection = left;
 			NinetyGegreeTurn();
@@ -74,7 +76,6 @@ void MotorsController::FollowLine(){
 			nextDirection = directionController->GetNextDirection();
 			Stright(true);	
 			state = followGyroscope;			
-			timeReachedIntersecction = millis();
 
 			if(communicationManager != nullptr)
 				communicationManager->SendMsg(MESSAGE::YELLOW_LED);
@@ -83,14 +84,14 @@ void MotorsController::FollowLine(){
 	else if (currentAction == leftCorrection) { //desvio derecha
 		Stright(true);
 
-		analogWrite(leftSpeed, REDUCED_SPEED);
-		analogWrite(rightSpeed, INCREASED_SPEED);
+		analogWrite(leftSpeed, REDUCED_SPEED * 0.8f);
+		analogWrite(rightSpeed, INCREASED_SPEED * 1.2f);
 	}
 	else if(currentAction == rightCorrection){ //desvio izquierda
 		Stright(true);
 
-		analogWrite(leftSpeed, INCREASED_SPEED);
-		analogWrite(rightSpeed, REDUCED_SPEED);
+		analogWrite(leftSpeed, INCREASED_SPEED * 1.2f);
+		analogWrite(rightSpeed, REDUCED_SPEED * 0.8f);
 		
 	}
 	else if (currentAction == lost){ //parada
@@ -102,7 +103,8 @@ void MotorsController::FollowLine(){
  * @brief Controla el giro, encargado de pararlo cuando es necesario 
  */
 void MotorsController::Turning(){
-	if(CurrentDirectionOffset() < TURNING_DEGREES_BUFFER){
+	if(CurrentDirectionOffset() < TURNING_DEGREES_BUFFER &&
+	millis() - timeReachedIntersecction > 100){ //para que si entra pasado, no detecte giro al pasar por el punto medio
 		turningDirection = (turningDirection == right) ? left: right;
 		Turn();
 		delay(35);
@@ -312,12 +314,12 @@ void MotorsController::AplyOverCorrection(TurningDirection dir){
 	Stright(true);
 
 	if(dir == left){
-		analogWrite(leftSpeed, REDUCED_SPEED);
-		analogWrite(rightSpeed, INCREASED_SPEED);
+		analogWrite(leftSpeed, REDUCED_SPEED * 0.8f);
+		analogWrite(rightSpeed, INCREASED_SPEED * 1.2f);
 	}
 	else if (dir == right){
-		analogWrite(leftSpeed, INCREASED_SPEED);
-		analogWrite(rightSpeed, REDUCED_SPEED);
+		analogWrite(leftSpeed, INCREASED_SPEED * 1.2f);
+		analogWrite(rightSpeed, REDUCED_SPEED * 0.8f);
 	}
 }
 
