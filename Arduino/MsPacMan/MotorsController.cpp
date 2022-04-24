@@ -84,14 +84,14 @@ void MotorsController::FollowLine(){
 	else if (currentAction == leftCorrection) { //desvio derecha
 		Stright(true);
 
-		analogWrite(leftSpeed, REDUCED_SPEED * 0.8f);
-		analogWrite(rightSpeed, INCREASED_SPEED * 1.2f);
+		analogWrite(leftSpeed, REDUCED_SPEED);
+		analogWrite(rightSpeed, INCREASED_SPEED);
 	}
 	else if(currentAction == rightCorrection){ //desvio izquierda
 		Stright(true);
 
-		analogWrite(leftSpeed, INCREASED_SPEED * 1.2f);
-		analogWrite(rightSpeed, REDUCED_SPEED * 0.8f);
+		analogWrite(leftSpeed, INCREASED_SPEED);
+		analogWrite(rightSpeed, REDUCED_SPEED);
 		
 	}
 	else if (currentAction == lost){ //parada

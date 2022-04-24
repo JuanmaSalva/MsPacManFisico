@@ -3,20 +3,10 @@
 #define MPU6050_ADDRESS_AD0_HIGH    0x69      // direccion I2C con AD0 en HIGH
 #define MPU6050_DEFAULT_ADDRESS     MPU6050_ADDRESS_AD0_LOW // por defecto AD0 en LOW
 
-
-#define DRIFT 6
-float currentYaw = 0;
-float previousYaw = 0;
-float driftedYaw = 0;
-float generaloffset = 0;
-
-int aux = 0;
-
 Simple_MPU6050 mpu;       // crea objeto con nombre mpu
 // ENABLE_MPU_OVERFLOW_PROTECTION();    // activa proteccion, ya no se requiere
 
-//#define OFFSETS  -667, -3921, 979, 61, 11, -1  // Colocar valores personalizados
-#define OFFSETS  -667, -3921, 979, 61, 11, -1  // Colocar valores personalizados
+// #define OFFSETS  -5114,     484,    1030,      46,     -14,       6  // Colocar valores personalizados
 
 #define spamtimer(t) for (static uint32_t SpamTimer; (uint32_t)(millis() - SpamTimer) >= (t); SpamTimer = millis())
 // spamtimer funcion para generar demora al escribir en monitor serie sin usar delay()
@@ -36,69 +26,12 @@ void mostrar_valores (int16_t *gyro, int16_t *accel, int32_t *quat, uint32_t *ti
     mpu.GetGravity(&gravity, &q);   // funcion para obtener valor para calculo posterior
     mpu.GetYawPitchRoll(ypr, &q, &gravity); // funcion obtiene valores de yaw, ptich, roll
     mpu.ConvertToDegrees(ypr, xyz);   // funcion convierte a grados sexagesimales
-
-    driftedYaw = 0;
-    if(xyz[0] < 0)
-      driftedYaw = 360 + xyz[0];
-    else 
-      driftedYaw = xyz[0];
-
-    anguloReal(driftedYaw);
-
-    //Serial.printfloatx(F("Yaw")  , xyz[0] , 9, 4, F(",   "));  // muestra en monitor serie rotacion de eje Z, yaw
-    //Serial.printfloatx(F("Pitch"), xyz[1], 9, 4, F(",   "));  // muestra en monitor serie rotacion de eje Y, pitch
-    //Serial.printfloatx(F("Roll") , xyz[2], 9, 4, F(",   "));  // muestra en monitor serie rotacion de eje X, roll
-
-    if(aux < 150){
-      aux++;
-      if(aux == 150){
-        Serial.println("YAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-        generaloffset = driftedYaw;
-        previousYaw = 0;
-        currentYaw = 0;
-      }
-    }
-    
+    Serial.printfloatx(F("Yaw")  , xyz[0], 9, 4, F(",   "));  // muestra en monitor serie rotacion de eje Z, yaw
+    Serial.printfloatx(F("Pitch"), xyz[1], 9, 4, F(",   "));  // muestra en monitor serie rotacion de eje Y, pitch
+    Serial.printfloatx(F("Roll") , xyz[2], 9, 4, F(",   "));  // muestra en monitor serie rotacion de eje X, roll
     Serial.println();       // salto de linea
   }
 }
-
-
-void anguloReal(float driftedYaw){
-    if(generaloffset != 0)
-      driftedYaw -= generaloffset;
-    
-    //Serial.printfloatx(F("Yaw")  , driftedYaw, 9, 4, F(",   "));
-    float delta = getDelta(driftedYaw);
-
-    currentYaw += delta;
-
-    //currentYaw = fmod(currentYaw, 360.0);
-    if(currentYaw < -180.0)
-      currentYaw = 360 + currentYaw;
-    else if(currentYaw > 180)
-      currentYaw = currentYaw - 360;
-      
-    Serial.print(currentYaw);
-
-    previousYaw = driftedYaw;
-}
-
-float getDelta(float driftedYaw){
-    //drifed delta
-    float delta = (driftedYaw - previousYaw);
-    if(delta > 300) delta -= 360;
-    else if (delta < -300) delta += 360;
-
-    //undrif delta
-    float aux = (delta * DRIFT) / 360.0;
-    delta -= aux;
-
-    return delta;
-}
-
-
-
 
 void setup() {
   uint8_t val;
@@ -120,14 +53,16 @@ void setup() {
   Serial.println(F(" No se establecieron Offsets, haremos unos nuevos.\n" // muestra texto estatico
                    " Colocar el sensor en un superficie plana y esperar unos segundos\n"
                    " Colocar los nuevos Offsets en #define OFFSETS\n"
-                   " para saltar la calibracion inicial \n"));
+                   " para saltar la calibracion inicial \n"
+                   " \t\tPresionar cualquier tecla y ENTER"));
+  while (Serial.available() && Serial.read());    // lectura de monitor serie
+  while (!Serial.available());        // si no hay espera              
+  while (Serial.available() && Serial.read());    // lecyura de monitor serie
   mpu.SetAddress(MPU6050_ADDRESS_AD0_LOW).CalibrateMPU().load_DMP_Image();  // inicializacion de sensor
 #endif
   mpu.on_FIFO(mostrar_valores);   // llamado a funcion mostrar_valores si memoria FIFO tiene valores
 }
 
-
-
 void loop() {
-   mpu.dmp_read_fifo();    // funcion que evalua si existen datos nuevos en el sensor y llama
+  mpu.dmp_read_fifo();    // funcion que evalua si existen datos nuevos en el sensor y llama
 } 
