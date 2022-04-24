@@ -11,6 +11,7 @@ float driftedYaw = 0;
 float generaloffset = 0;
 
 int aux = 0;
+bool initialized = false;
 
 Simple_MPU6050 mpu;       // crea objeto con nombre mpu
 // ENABLE_MPU_OVERFLOW_PROTECTION();    // activa proteccion, ya no se requiere
@@ -51,21 +52,21 @@ void mostrar_valores (int16_t *gyro, int16_t *accel, int32_t *quat, uint32_t *ti
 
     if(aux < 150){
       aux++;
+      Serial.print(".");
       if(aux == 150){
-        Serial.println("YAAAAAAAAAAAAAAAAAAAAAAAAAAA");
         generaloffset = driftedYaw;
         previousYaw = 0;
         currentYaw = 0;
+        initialized = true;
+        Serial.println("\nInicializado");
       }
     }
-    
-    Serial.println();       // salto de linea
   }
 }
 
 
 void anguloReal(float driftedYaw){
-    if(generaloffset != 0)
+    if(initialized)
       driftedYaw -= generaloffset;
     
     //Serial.printfloatx(F("Yaw")  , driftedYaw, 9, 4, F(",   "));
@@ -79,7 +80,8 @@ void anguloReal(float driftedYaw){
     else if(currentYaw > 180)
       currentYaw = currentYaw - 360;
       
-    Serial.print(currentYaw);
+    if(initialized)
+      Serial.println(currentYaw);
 
     previousYaw = driftedYaw;
 }
@@ -124,6 +126,10 @@ void setup() {
   mpu.SetAddress(MPU6050_ADDRESS_AD0_LOW).CalibrateMPU().load_DMP_Image();  // inicializacion de sensor
 #endif
   mpu.on_FIFO(mostrar_valores);   // llamado a funcion mostrar_valores si memoria FIFO tiene valores
+
+  Serial.println("\nVamos a proceder a inicializar el giroscopio");
+  while(!initialized)
+    mpu.dmp_read_fifo();
 }
 
 
