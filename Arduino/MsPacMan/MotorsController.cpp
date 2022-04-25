@@ -43,8 +43,6 @@ void MotorsController::Update(){
 	case followGyroscope:
 		FollowGyroscope();
 		break;
-	case braking:
-		Braking();
 		break;
 	default:
 		break;
@@ -62,13 +60,10 @@ void MotorsController::FollowLine(){
 	
 	if(currentAction == Action::straight){ //recto		
 		Stright(true);
-
-		if(CurrentDirectionOffset() > STRIGHT_DEGREES_BUFFER){
-			TurningDirection overCorrectionDir = OverCorrectionDirection();
-			AplyOverCorrection(overCorrectionDir);		
-		}
 	}
 	else if(currentAction == turn){ //Giro 90 grados
+		timeReachedIntersecction = millis();
+
 		if(nextDirection == TurningDirection::left){
 			turningDirection = left;
 			NinetyGegreeTurn();
@@ -81,7 +76,6 @@ void MotorsController::FollowLine(){
 			nextDirection = directionController->GetNextDirection();
 			Stright(true);	
 			state = followGyroscope;			
-			timeReachedIntersecction = millis();
 
 			if(communicationManager != nullptr)
 				communicationManager->SendMsg(MESSAGE::YELLOW_LED);
@@ -90,26 +84,15 @@ void MotorsController::FollowLine(){
 	else if (currentAction == leftCorrection) { //desvio derecha
 		Stright(true);
 
-		if(CurrentDirectionOffset() > STRIGHT_DEGREES_BUFFER){
-			analogWrite(leftSpeed, (int)(REDUCED_SPEED * 0.8f));
-			analogWrite(rightSpeed, (int)(INCREASED_SPEED * 1.2f));
-		}
-		else {
-			analogWrite(leftSpeed, REDUCED_SPEED);
-			analogWrite(rightSpeed, INCREASED_SPEED);
-		}
+		analogWrite(leftSpeed, REDUCED_SPEED);
+		analogWrite(rightSpeed, INCREASED_SPEED);
 	}
 	else if(currentAction == rightCorrection){ //desvio izquierda
 		Stright(true);
 
-		if(CurrentDirectionOffset() > STRIGHT_DEGREES_BUFFER){
-			analogWrite(leftSpeed, (int)(INCREASED_SPEED * 1.2f));
-			analogWrite(rightSpeed, (int)(REDUCED_SPEED * 0.8f));
-		}
-		else {
-			analogWrite(leftSpeed, INCREASED_SPEED);
-			analogWrite(rightSpeed, REDUCED_SPEED);
-		}
+		analogWrite(leftSpeed, INCREASED_SPEED);
+		analogWrite(rightSpeed, REDUCED_SPEED);
+		
 	}
 	else if (currentAction == lost){ //parada
 		Stop();
@@ -120,7 +103,8 @@ void MotorsController::FollowLine(){
  * @brief Controla el giro, encargado de pararlo cuando es necesario 
  */
 void MotorsController::Turning(){
-	if(CurrentDirectionOffset() < TURNING_DEGREES_BUFFER){
+	if(CurrentDirectionOffset() < TURNING_DEGREES_BUFFER &&
+	millis() - timeReachedIntersecction > 100){ //para que si entra pasado, no detecte giro al pasar por el punto medio
 		turningDirection = (turningDirection == right) ? left: right;
 		Turn();
 		delay(35);
@@ -172,7 +156,7 @@ void MotorsController::TurnExit(){
  * recibidos por el giroscopio 
  */
 void MotorsController::FollowGyroscope(){
-	if(CurrentDirectionOffset() >= STRIGHT_DEGREES_BUFFER){
+	if(CurrentDirectionOffset() >= TURNING_DEGREES_BUFFER){
 		TurningDirection overCorrectionDir = OverCorrectionDirection();
 		AplyOverCorrection(overCorrectionDir);
 	}
@@ -180,8 +164,7 @@ void MotorsController::FollowGyroscope(){
 	
 	//hemos salido de la zona de la interseccion (zona negra) y los sensores ya detectan
 	//los carriles. Ya se puede volver al control normal
-	if(lineTracker->GetCurrentAction() == Action::straight ||
-	millis() - timeReachedIntersecction > MINIMUM_EXIT_TURN_TIME){
+	if(millis() - timeReachedIntersecction > MINIMUM_EXIT_TURN_TIME){
 		state = followingLine;
 		if(communicationManager != nullptr)
 			communicationManager->SendMsg(MESSAGE::GREEN_LED);
@@ -214,27 +197,6 @@ void MotorsController::Stright(bool forwards){
 }
 
 
-/**
- * @brief Encargado de invertir la dirección de los motors para frenar exactamente incuma de la interseccion 
- */
-void MotorsController::Braking(){
-	delay(TIME_TO_START_BRAKING);
-	Stright(false);	
-	delay(GetBrakingTime());
-	Stop();
-	delay(250);
-
-	state = turning;
-	
-	if(turningDirection == TurningDirection::left)
-		perfectAngle += 270;
-	else if(turningDirection == TurningDirection::right)
-		perfectAngle += 90;
-
-	perfectAngle = perfectAngle % 360;
-	gyroscopeController->SetTargetYaw(perfectAngle);
-	Turn();
-}
 
 
 int MotorsController::GetBrakingTime(){
@@ -265,7 +227,20 @@ void MotorsController::Stop(){
 void MotorsController::NinetyGegreeTurn(){	
 	if(communicationManager != nullptr)
 		communicationManager->SendMsg(MESSAGE::RED_LED);
-	state = braking;
+	
+	Stop();
+	delay(300);
+
+	state = turning;
+	
+	if(turningDirection == TurningDirection::left)
+		perfectAngle += 270;
+	else if(turningDirection == TurningDirection::right)
+		perfectAngle += 90;
+
+	perfectAngle = perfectAngle % 360;
+	gyroscopeController->SetTargetYaw(perfectAngle);
+	Turn();
 }
 
 
@@ -339,12 +314,12 @@ void MotorsController::AplyOverCorrection(TurningDirection dir){
 	Stright(true);
 
 	if(dir == left){
-		analogWrite(leftSpeed, REDUCED_SPEED);
-		analogWrite(rightSpeed, INCREASED_SPEED);
+		analogWrite(leftSpeed, REDUCED_SPEED * 0.8f);
+		analogWrite(rightSpeed, INCREASED_SPEED * 1.2f);
 	}
 	else if (dir == right){
-		analogWrite(leftSpeed, INCREASED_SPEED);
-		analogWrite(rightSpeed, REDUCED_SPEED);
+		analogWrite(leftSpeed, INCREASED_SPEED * 1.2f);
+		analogWrite(rightSpeed, REDUCED_SPEED * 0.8f);
 	}
 }
 

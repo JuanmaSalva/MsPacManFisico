@@ -4,14 +4,20 @@
 #define MPU6050_DEFAULT_ADDRESS     MPU6050_ADDRESS_AD0_LOW // por defecto AD0 en LOW
 
 
-#define DRIFT 5.0
+#define DRIFT 6
 float currentYaw = 0;
 float previousYaw = 0;
+float driftedYaw = 0;
+float generaloffset = 0;
+
+int aux = 0;
+bool initialized = false;
 
 Simple_MPU6050 mpu;       // crea objeto con nombre mpu
 // ENABLE_MPU_OVERFLOW_PROTECTION();    // activa proteccion, ya no se requiere
 
-// #define OFFSETS  -5114,     484,    1030,      46,     -14,       6  // Colocar valores personalizados
+//#define OFFSETS  -667, -3921, 979, 61, 11, -1  // Colocar valores personalizados
+#define OFFSETS  -667, -3921, 979, 61, 11, -1  // Colocar valores personalizados
 
 #define spamtimer(t) for (static uint32_t SpamTimer; (uint32_t)(millis() - SpamTimer) >= (t); SpamTimer = millis())
 // spamtimer funcion para generar demora al escribir en monitor serie sin usar delay()
@@ -32,7 +38,7 @@ void mostrar_valores (int16_t *gyro, int16_t *accel, int32_t *quat, uint32_t *ti
     mpu.GetYawPitchRoll(ypr, &q, &gravity); // funcion obtiene valores de yaw, ptich, roll
     mpu.ConvertToDegrees(ypr, xyz);   // funcion convierte a grados sexagesimales
 
-    float driftedYaw = 0;
+    driftedYaw = 0;
     if(xyz[0] < 0)
       driftedYaw = 360 + xyz[0];
     else 
@@ -43,14 +49,25 @@ void mostrar_valores (int16_t *gyro, int16_t *accel, int32_t *quat, uint32_t *ti
     //Serial.printfloatx(F("Yaw")  , xyz[0] , 9, 4, F(",   "));  // muestra en monitor serie rotacion de eje Z, yaw
     //Serial.printfloatx(F("Pitch"), xyz[1], 9, 4, F(",   "));  // muestra en monitor serie rotacion de eje Y, pitch
     //Serial.printfloatx(F("Roll") , xyz[2], 9, 4, F(",   "));  // muestra en monitor serie rotacion de eje X, roll
-    
-    
-    Serial.println();       // salto de linea
+
+    if(aux < 150){
+      aux++;
+      Serial.print(".");
+      if(aux == 150){
+        generaloffset = driftedYaw;
+        previousYaw = 0;
+        currentYaw = 0;
+        initialized = true;
+        Serial.println("\nInicializado");
+      }
+    }
   }
 }
 
 
 void anguloReal(float driftedYaw){
+    if(initialized)
+      driftedYaw -= generaloffset;
     
     //Serial.printfloatx(F("Yaw")  , driftedYaw, 9, 4, F(",   "));
     float delta = getDelta(driftedYaw);
@@ -63,8 +80,8 @@ void anguloReal(float driftedYaw){
     else if(currentYaw > 180)
       currentYaw = currentYaw - 360;
       
-    
-    Serial.print(currentYaw);
+    if(initialized)
+      Serial.println(currentYaw);
 
     previousYaw = driftedYaw;
 }
@@ -109,8 +126,14 @@ void setup() {
   mpu.SetAddress(MPU6050_ADDRESS_AD0_LOW).CalibrateMPU().load_DMP_Image();  // inicializacion de sensor
 #endif
   mpu.on_FIFO(mostrar_valores);   // llamado a funcion mostrar_valores si memoria FIFO tiene valores
+
+  Serial.println("\nVamos a proceder a inicializar el giroscopio");
+  while(!initialized)
+    mpu.dmp_read_fifo();
 }
 
+
+
 void loop() {
-  mpu.dmp_read_fifo();    // funcion que evalua si existen datos nuevos en el sensor y llama
+   mpu.dmp_read_fifo();    // funcion que evalua si existen datos nuevos en el sensor y llama
 } 
