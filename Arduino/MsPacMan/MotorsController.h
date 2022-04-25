@@ -12,10 +12,10 @@ class DirectionController;
 #define INCREASED_SPEED 95.0
 
 
-#define TURNING_DEGREES_BUFFER 5.0
-#define EXIT_TURN_BUFFER 5.0
+#define TURNING_DEGREES_BUFFER 1.0
+#define EXIT_TURN_BUFFER 2.0
 
-#define MINIMUM_EXIT_TURN_TIME 400.0
+#define MINIMUM_EXIT_TURN_TIME 300.0
 #define FULL_BRAKE_TIME 65.0
 #define MIN_TIME_FOR_FULL_BRAKE 750 //TODO esto a lo mejor ya no tiene sentido
 

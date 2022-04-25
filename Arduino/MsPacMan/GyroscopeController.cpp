@@ -1,10 +1,16 @@
 #include "GyroscopeController.h"
 
 Simple_MPU6050 myMpu;
-#define DRIFT 4.0
+#define DRIFT 6.0
 float currentYaw = 0;
 float previousYaw = 0;
 float positiveCurrentYaw;
+float generaloffset = 0;
+
+bool initialized = false;
+
+long initializeTime;
+
 
 GyroscopeController::GyroscopeController(){
 	acumulatedYaw = 0;
@@ -25,6 +31,9 @@ float GetDelta(float driftedYaw){
 }
 
 float CalculateRealAngle(float driftedYaw){
+	if(initialized)
+      driftedYaw -= generaloffset;
+
 	float delta = GetDelta(driftedYaw);
     previousYaw = driftedYaw;
 
@@ -54,27 +63,37 @@ float CalculateRealAngle(float driftedYaw){
  * @param timestamp tiempo desde la última toma de datos
  */
 void ShowValues(int16_t *gyro, int16_t *accel, int32_t *quat, uint32_t *timestamp){
-	Quaternion q;
-	VectorFloat gravity;
-	float ypr[3] = { 0, 0, 0 };
-	float xyz[3] = { 0, 0, 0 };
-	myMpu.GetQuaternion(&q, quat);
-	myMpu.GetGravity(&gravity, &q);
-	myMpu.GetYawPitchRoll(ypr, &q, &gravity);
-	myMpu.ConvertToDegrees(ypr, xyz);
-	
-	/*if(xyz[0] < 0)
-		positiveCurrentYaw = 360 + xyz[0];
-	else 
-		positiveCurrentYaw = xyz[0];*/
+	//spamtimer(100){
+		Quaternion q;
+		VectorFloat gravity;
+		float ypr[3] = { 0, 0, 0 };
+		float xyz[3] = { 0, 0, 0 };
+		myMpu.GetQuaternion(&q, quat);
+		myMpu.GetGravity(&gravity, &q);
+		myMpu.GetYawPitchRoll(ypr, &q, &gravity);
+		myMpu.ConvertToDegrees(ypr, xyz);
 
-	float driftedYaw = 0;
-	if(xyz[0] < 0)
-		driftedYaw = 360 + xyz[0];
-	else 
-		driftedYaw = xyz[0];
+		/*if(xyz[0] < 0)
+			positiveCurrentYaw = 360 + xyz[0];
+		else 
+			positiveCurrentYaw = xyz[0];*/
 
-	positiveCurrentYaw = CalculateRealAngle(driftedYaw);
+		float driftedYaw = 0;
+		if(xyz[0] < 0)
+			driftedYaw = 360 + xyz[0];
+		else 
+			driftedYaw = xyz[0];
+
+		positiveCurrentYaw = CalculateRealAngle(driftedYaw);
+
+		if(!initialized && millis() - initializeTime > TIME_TO_CALCULATE_DESVIATION){
+			generaloffset = driftedYaw;
+			previousYaw = 0;
+			currentYaw = 0;
+			initialized = true;
+			Serial.println("\nInicializado");
+		}
+	//}
 }
 
 
@@ -109,6 +128,11 @@ void GyroscopeController::Init(){
 #endif
 	myMpu.on_FIFO(ShowValues);   // llamado a funcion mostrar_valores si memoria FIFO tiene valores
 	
+	Serial.println("\nVamos a proceder a inicializar el giroscopio");
+	
+	initializeTime = millis();
+	while(!initialized)
+    	myMpu.dmp_read_fifo();
 }
 
 
