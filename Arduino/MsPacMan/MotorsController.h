@@ -66,7 +66,7 @@ private:
 	int GetBrakingTime();
 
 public:
-	void Stright(bool forwards); //Provisional para probar el bletooh, volver a provado luego
+	void Stright(bool forwards); //Provisional para probar el bluetooh, volver a provado luego
 	void Stop();
 
 	MotorsController();
