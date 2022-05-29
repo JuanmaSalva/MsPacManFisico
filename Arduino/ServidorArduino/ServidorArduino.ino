@@ -9,11 +9,15 @@ int red = 9;
 int green = 10;
 int blue = 11;
 
-void setup() {
+
+/**
+ * @brief Se inicializan todos los pines del Arduino 
+ */
+void Init(){
 	Serial.begin(9600);
 	while(!Serial);
 	Serial.println("Inicializamos");
-	
+
 	pinMode(red, OUTPUT);
 	pinMode(green, OUTPUT);
 	pinMode(blue, OUTPUT);
@@ -21,7 +25,10 @@ void setup() {
 	analogWrite(red, 255);
 	analogWrite(green, 0);
 	analogWrite(blue, 0);
+}
 
+void setup() {	
+	Init();
 
 	//inicialización y sincronización de la comunicación con el robot
 	communicationManager = new CommunicationManager();
@@ -48,7 +55,13 @@ void setup() {
 	analogWrite(blue, 0);
 }
 
-void Java(){
+
+/**
+ * @brief Se reciben y se procesan los mensajes del MsPacManEngine
+ * Actualmente solo se imprimen por el monitor serial ya que el recorrido
+ * es fijo para facilitar la depuración en el robot
+ */
+void MsPacManEngineCommunication(){
 	if(Serial.available()){
 		JAVA_MESSAGE msg = serverManager->ReadMsg();
 		
@@ -67,8 +80,9 @@ void Java(){
 	}
 }
 
+
 /**
- * @brief Procesamiento de los mensajes de debug 
+ * @brief Se lee y se procesan de los mensajes de debug recibidos desde el robot
  **/
 void DebugLed(){
 	if(communicationManager->MsgAvailable()){
@@ -114,7 +128,7 @@ void DebugLed(){
 }
 
 void loop() {
-	Java();
+	MsPacManEngineCommunication();
 
 	DebugLed();
 }

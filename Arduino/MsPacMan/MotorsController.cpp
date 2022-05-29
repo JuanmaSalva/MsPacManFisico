@@ -10,6 +10,9 @@ MotorsController::MotorsController(){
 	perfectAngle = 0;
 }
 
+/**
+ * @brief Inicializa los pines del Arduino
+ */
 void MotorsController::Init(){
 	pinMode(rightSpeed, OUTPUT);
 	pinMode(forwardRight, OUTPUT);
@@ -21,6 +24,10 @@ void MotorsController::Init(){
 	Stop();
 }
 
+
+/**
+ * @brief empieza el movimiento del robot 
+ */
 void MotorsController::Start(){
 	Stright(true);
 
@@ -28,6 +35,10 @@ void MotorsController::Start(){
 	timeSinceLastTurn = millis();
 }
 
+
+/**
+ * @brief Realiza la acción correspondiente según en que estado se encuentre
+ */
 void MotorsController::Update(){
 	switch (state)
 	{
@@ -198,7 +209,11 @@ void MotorsController::Stright(bool forwards){
 
 
 
-
+/**
+ * @brief Calcual el tiempo en ms necesario de frenado para el tiempo que lleva acelerando
+ * 
+ * @return tiempo en ms que tiene que estar frenando al llegar a una intersección
+ */
 int MotorsController::GetBrakingTime(){
 	if(millis() - timeSinceLastTurn > MIN_TIME_FOR_FULL_BRAKE){
 		return FULL_BRAKE_TIME;
