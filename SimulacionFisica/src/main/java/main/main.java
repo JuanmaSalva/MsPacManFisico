@@ -15,18 +15,19 @@ import pacman.controllers.PacmanController;
 import pacman.game.internal.POType;
 
 
-public class main {
 
+public class main {	
+	
 	public static void main(String[] args) throws IOException, InterruptedException{		
 		
-		System.out.println("Vamos a inicializar el arduino");
-	
-		SerialPort sp = SerialPort.getCommPort("/dev/ttyACM0"); //TODO esto deberia estar parametrizado
+		//Se inicializa el arduino
+		System.out.println("Vamos a inicializar el arduino");	
+		SerialPort sp = SerialPort.getCommPort("/dev/ttyACM0");
 		sp.setComPortParameters(9600, 8, 1, 0);
 		sp.setComPortTimeouts(SerialPort.TIMEOUT_READ_BLOCKING | SerialPort.TIMEOUT_WRITE_BLOCKING, 0, 0);
 		
 
-		
+		//Abrimos el puerto de comunicación con el arduino
 		if(sp.openPort()) {
 			System.out.println("Puerto abierto");
 			sp.getInputStream().close();			
@@ -40,6 +41,8 @@ public class main {
 		
 		CommunicationManager.MessageSender.SetSerialPort(sp);
 		
+		
+		//Se limpia el InputStream por si hay basura de otras ejecuciones
 		try {
 			sp.getInputStream().close();
 		} catch (IOException e1) {
@@ -59,14 +62,14 @@ public class main {
 		
 
 		System.out.println("SINCRONIZADOS");	
-		*/
 		
-		//INICIAR EL SIMULADOR
-		startExecution();
+		
+		//Se inicializa el servidor
 		System.out.println("Emepzamos el simulador");	
+		startExecution();
 		
 		
-		
+		//Cerramos el puerto del arduino
 		sp.getInputStream().close(); //limpiamos antes de cerrar para cuando se vuelva a abrir	
 		if(sp.closePort()) {
 			System.out.println("Puerto cerrado");	
