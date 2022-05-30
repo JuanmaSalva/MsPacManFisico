@@ -22,7 +22,7 @@ public class MsPacManObserver implements GameObserver{
 
 	public void ghostsMove(EnumMap<GHOST, MOVE> moves, EnumMap<GHOST, Boolean> inJunction) {
 		//System.out.println("Ghost move");
-		
+		//Se ignora ya que no hay robots para los fantasmas de momento
 	}
 	
 	public void gameStarted() {

@@ -4,12 +4,20 @@ LineTracker::LineTracker(){
 	currentAction = lost;
 }
 
+
+/**
+ * @brief Inicializa las pines del Arduino
+ */
 void LineTracker::Init(){
 	pinMode(SENSOR_L, INPUT);
 	pinMode(SENSOR_C, INPUT);
 	pinMode(SENSOR_R, INPUT);
 }
 
+
+/**
+ * @brief lee los sensores y establece que acción hay que relizar segun los datos leidos
+ */
 void LineTracker::Update(){
 	int _left = digitalRead(SENSOR_L);
 	int _center = digitalRead(SENSOR_C);
@@ -27,10 +35,11 @@ void LineTracker::Update(){
 		currentAction = Action::lost;
 }
 
+
 /**
  * @brief Devuelve la acción que debería hacer el robot en un determinado instante
  * 
- * @return Acción 
+ * @return Acción a realizar
  */
 Action LineTracker::GetCurrentAction(){
 	return currentAction;

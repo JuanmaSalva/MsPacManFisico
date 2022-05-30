@@ -6,15 +6,17 @@ CommunicationManager::CommunicationManager(): miBT(3,9)
 }
 
 void CommunicationManager::Init(){
-	miBT.begin(9600);
+	miBT.begin(9600); //establece frecuéncia de comunicación
 }
 
 /**
- * @brief Sincroniza el robot con el servidor arduino 
+ * @brief Sincroniza el robot con el servidor arduino.
+ * Todo mensaje recibido que no se SYNC_ATTEMP será ignorad y perdido
  */
 void CommunicationManager::Sync(){
 	Serial.println("intentnado sincronizar");
 	
+	//esperamos hasta recibir el mensaje de sincronicación
 	while(true){
 		if(miBT.available()){
 			MESSAGE msg = ReadMsg();
@@ -78,12 +80,14 @@ void CommunicationManager::WaitApproval(){
 
 
 void CommunicationManager::Update(){
-	/*if(miBT.available()){
-		MESSAGE msg = ReadMsg();
-		if(msg == OK){
-			return;
-		}
-	}*/
+	//Comentado provisionalmente ya que de momento el recorrido está establecido por defecto en el DirectionController
+
+	// if(miBT.available()){
+	// 	MESSAGE msg = ReadMsg();
+	// 	if(msg == OK){
+	// 		return;
+	// 	}
+	// }
 }
 
 /**
