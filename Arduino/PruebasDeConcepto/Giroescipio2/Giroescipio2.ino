@@ -48,6 +48,7 @@ void loop() {
       BMI160.readAccelerometer(axRaw, ayRaw, azRaw);
     
       // convert the raw gyro data to degrees/second
+      //Serial.println(convertRawGyro(gzRaw) - 0.50);
       gx = convertRawGyro(gxRaw);
       gy = convertRawGyro(gyRaw);
       gz = convertRawGyro(gzRaw);
@@ -62,13 +63,11 @@ void loop() {
       Serial.println(yaw);
 
   
-    microsPrevious = microsPrevious + microsPerReading;
+      microsPrevious = microsPrevious + microsPerReading;
   } 
-  
-
-
-  //delay(250);
 }
+
+
 
 float convertRawGyro(int gRaw) {
   // since we are using 250 degrees/seconds range
