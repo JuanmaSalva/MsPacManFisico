@@ -2,8 +2,8 @@
 #include <Arduino.h>
 #include "States.h"
 
-#define NORMAL_SPEED 85.0
-#define REDUCED_SPEED 0.0
+#define NORMAL_SPEED 100.0
+#define REDUCED_SPEED 40.0
 #define INCREASED_SPEED 255.0
 
 
