@@ -42,17 +42,17 @@ void setup() {
 	analogWrite(blue, 255);
 
 
-	serverManager = new ServerManager();
-	serverManager->SyncToJava();
+	// serverManager = new ServerManager();
+	// serverManager->SyncToJava();
 
 
-	serverManager->WaitForMsg(JAVA_MESSAGE::JAVA_START);
-	communicationManager->SendMsg(MESSAGE::START);
+	// serverManager->WaitForMsg(JAVA_MESSAGE::JAVA_START);
+	// communicationManager->SendMsg(MESSAGE::START);
 
 
-	analogWrite(red, 0);
-	analogWrite(green, 255);
-	analogWrite(blue, 0);
+	// analogWrite(red, 0);
+	// analogWrite(green, 255);
+	// analogWrite(blue, 0);
 }
 
 
@@ -128,7 +128,7 @@ void DebugLed(){
 }
 
 void loop() {
-	MsPacManEngineCommunication();
+	// MsPacManEngineCommunication();
 
-	DebugLed();
+	// DebugLed();
 }

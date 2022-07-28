@@ -4,22 +4,37 @@ LineTracker::LineTracker(){
 }
 
 void LineTracker::Init(){
-	pinMode(SENSOR, INPUT);
+	pinMode(START_SENSOR, INPUT);
 }
 
 
 void LineTracker::Update(){
-	if(digitalRead(SENSOR) == BLACK)
-		blackLine = true;
-	else
-		blackLine = false;
+	leftLine = false;
+	
+	if(digitalRead(START_SENSOR) == BLACK && previousLeftLine == false){
+		leftLine = true;
+		previousLeftLine = true;
+	}
+	else if (digitalRead(START_SENSOR) != BLACK)
+	{
+		previousLeftLine = false;
+	}
 }
 
 /**
- * @brief Devuelve si la linea de abajo del robot es negra o no
+ * @brief Devuelve si la linea de abajo del lado izquierdo del robot es negra o no
  * 
  * @return Color 
  */
-bool LineTracker::IsBlackLine(){
-	return blackLine;
+bool LineTracker::StartTurn(){
+	return leftLine;
+}
+
+/**
+ * @brief Devuelve si la linea de abajo del lado derecho robot es negra o no
+ * 
+ * @return Color 
+ */
+bool LineTracker::EndTurn(){
+	return leftLine;
 }

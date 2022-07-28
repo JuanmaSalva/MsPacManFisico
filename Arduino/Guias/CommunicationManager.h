@@ -1,6 +1,8 @@
 #pragma once
-#include <SoftwareSerial.h>
 #include <Arduino.h>
+#include <SoftwareSerial.h>
+
+class DirectionController;
 
 enum MESSAGE{
 	SYNC_ATTEMP,
@@ -10,6 +12,7 @@ enum MESSAGE{
 	DIRECCTION_INITIALIZED,
 
 	START,
+
 
 	RED_LED,
 	GREEN_LED,
@@ -21,20 +24,28 @@ enum MESSAGE{
 	OK
 };
 
+
 class CommunicationManager{
 private:
 	SoftwareSerial miBT;
+
+	int8_t id;
+	bool start = false;
+
+	DirectionController* directionController;
 public:
-    CommunicationManager();
+	CommunicationManager();
 
-    void Init();
-    void Sync();
-    void WaitForRobotToInitialize();
-	void WaitForMsg(MESSAGE msg);
+	void Init();
+	void Sync();
+	void Update();
 
-	bool MsgAvailable();
+	void SetDirectionController(DirectionController* d);
 
 	void SendMsg(MESSAGE msg);
 	MESSAGE ReadMsg();
-	
+	bool MsgAvailable();
+
+	void WaitApproval();
+	void WaitForMsg(MESSAGE msg);
 };

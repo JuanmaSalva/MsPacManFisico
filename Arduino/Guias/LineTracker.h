@@ -9,8 +9,11 @@
 
 class LineTracker{
 private:
-	int SENSOR = 9;
-    bool blackLine = false;
+	int START_SENSOR = 9;
+
+    bool leftLine = false;
+
+    bool previousLeftLine = false;
 
 public:
 
@@ -19,5 +22,6 @@ public:
     void Init();
     void Update();
 
-    bool IsBlackLine();
+    bool StartTurn();
+    bool EndTurn();
 };

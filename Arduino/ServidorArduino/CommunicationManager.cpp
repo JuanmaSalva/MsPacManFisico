@@ -70,9 +70,6 @@ void CommunicationManager::WaitForRobotToInitialize(){
 	WaitForMsg(LINE_TRACKER_INITIALIZED);
 	Serial.println("Sensores Linea Inicializados");
 	
-	WaitForMsg(GYROSCOPE_INITIALIZED);
-	Serial.println("Giroscopio Inicializados");
-	
 	WaitForMsg(MOTORS_INITIALIZED);
 	Serial.println("Motores Inicializados");
 
