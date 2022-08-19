@@ -8,6 +8,8 @@ public enum JAVA_MESSAGE {
     PAC_MAN_DOWN,
     PAC_MAN_LEFT,
     PAC_MAN_NEUTRAL,
+
+	TURN_ENDED,
     
     START,
 

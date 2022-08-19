@@ -1,20 +1,22 @@
 #pragma once
 #include "TurningDirecction.h"
 
-#define INSTRUCTIONS_COUNT 5
+#define INSTRUCTIONS_COUNT_MAX 10
+
+class CommunicationManager;
 
 class DirectionController{
 private:
-	//recorrido provisional
-	TurningDirection turningDirections[INSTRUCTIONS_COUNT] = {
-		TurningDirection::left, TurningDirection::left,
-		TurningDirection::left, TurningDirection::left,
-		TurningDirection::right	};
+	CommunicationManager* communicationManager;
 
-	int currentInstruction = 0;
+	TurningDirection nextIntersecction;
 
 public:
 	DirectionController();
 
+	void AddIntersection(TurningDirection direction);
+
 	TurningDirection GetNextDirection();
+
+	void SetCommunicationManager(CommunicationManager* comMng);
 };

@@ -42,12 +42,12 @@ void setup() {
 	analogWrite(blue, 255);
 
 
-	// serverManager = new ServerManager();
-	// serverManager->SyncToJava();
+	serverManager = new ServerManager();
+	serverManager->SyncToJava();
 
 
-	// serverManager->WaitForMsg(JAVA_MESSAGE::JAVA_START);
-	// communicationManager->SendMsg(MESSAGE::START);
+	serverManager->WaitForMsg(JAVA_MESSAGE::JAVA_START);
+	communicationManager->SendMsg(MESSAGE::START);
 
 
 	// analogWrite(red, 0);
@@ -55,6 +55,7 @@ void setup() {
 	// analogWrite(blue, 0);
 }
 
+JAVA_MESSAGE currentOrientation = JAVA_MESSAGE::PAC_MAN_LEFT;
 
 /**
  * @brief Se reciben y se procesan los mensajes del MsPacManEngine
@@ -64,19 +65,52 @@ void setup() {
 void MsPacManEngineCommunication(){
 	if(Serial.available()){
 		JAVA_MESSAGE msg = serverManager->ReadMsg();
-		
+		MESSAGE msgToSend = MESSAGE::NONE;
+
+
 		if(msg == PAC_MAN_UP){
 			Serial.println("Up");
+		
+			if(currentOrientation == PAC_MAN_LEFT)
+				msgToSend = RIGHT;
+			else if(currentOrientation == PAC_MAN_RIGHT)
+				msgToSend = LEFT;
+
+			currentOrientation = msg;
 		}
 		else if(msg == PAC_MAN_RIGHT){
-			Serial.println("Right");	
+			Serial.println("Right");
+
+			if(currentOrientation == PAC_MAN_UP)
+				msgToSend = RIGHT;
+			else if(currentOrientation == PAC_MAN_DOWN)
+				msgToSend = LEFT;
+
+			currentOrientation = msg;
 		}
 		else if(msg == PAC_MAN_DOWN){
 			Serial.println("Down");	
+
+			if(currentOrientation == PAC_MAN_LEFT)
+				msgToSend = LEFT;
+			else if(currentOrientation == PAC_MAN_RIGHT)
+				msgToSend = RIGHT;
+
+			currentOrientation = msg;
 		}
 		else if(msg == PAC_MAN_LEFT){
 			Serial.println("Left");	
+
+			if(currentOrientation == PAC_MAN_UP)
+				msgToSend = LEFT;
+			else if(currentOrientation == PAC_MAN_DOWN)
+				msgToSend = RIGHT;
+
+			currentOrientation = msg;
 		}
+		
+
+		communicationManager->SendMsg(msgToSend);
 	}
 }
 
@@ -124,11 +158,14 @@ void DebugLed(){
 			analogWrite(green, 255);
 			analogWrite(blue, 0);
 		}
+		else if(msg == TURN_ENDED){
+			serverManager->SendMsg(JAVA_MESSAGE::JAVA_TURN_ENDED);
+		}
 	}
 }
 
 void loop() {
-	// MsPacManEngineCommunication();
+	MsPacManEngineCommunication();
 
-	// DebugLed();
+	DebugLed();
 }

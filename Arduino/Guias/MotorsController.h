@@ -3,12 +3,13 @@
 #include "States.h"
 
 #define NORMAL_SPEED 100.0
-#define REDUCED_SPEED 30.0
+#define REDUCED_SPEED 40.0
 #define INCREASED_SPEED 255.0
 
 
 class LineTracker;
 class DirectionController;
+class CommunicationManager;
 
 
 class MotorsController{
@@ -25,6 +26,7 @@ private:
 
 	LineTracker* lineTracker;
 	DirectionController* directionController;
+	CommunicationManager* communicationManager;
 	States currentState;
 
 	void Straight();
@@ -34,9 +36,11 @@ public:
 	MotorsController();
 
 	void Init();
+	void Start();
 	void Update();
 
 
 	void SetLineTracker(LineTracker* _lineTracker);
 	void SetDirectionController(DirectionController* _directionController);
+	void SetCommunicationManager(CommunicationManager* _communicationManager);
 };

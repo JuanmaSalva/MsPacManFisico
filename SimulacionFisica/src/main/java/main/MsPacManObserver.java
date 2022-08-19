@@ -17,6 +17,13 @@ public class MsPacManObserver implements GameObserver{
 			System.out.println(move);
 			CommunicationManager.MessageSender.SendMsg(fromMoveToJavaMessagePacMan(move));
 			lastPacManMove = move;
+			
+			while(true) {
+				JAVA_MESSAGE msg = CommunicationManager.MessageSender.ReadMsg();
+				if(msg == JAVA_MESSAGE.TURN_ENDED) {
+					break;
+				}
+			}
 		}
 	}
 
@@ -31,16 +38,14 @@ public class MsPacManObserver implements GameObserver{
 	}
 	
 	private JAVA_MESSAGE fromMoveToJavaMessagePacMan(MOVE move) {
-		switch(move) {
-		case UP:
+		if(move == MOVE.UP)
 			return JAVA_MESSAGE.PAC_MAN_UP;
-		case DOWN:
+		else if(move == MOVE.DOWN)
 			return JAVA_MESSAGE.PAC_MAN_DOWN;
-		case RIGHT:
+		else if(move == MOVE.RIGHT)
 			return JAVA_MESSAGE.PAC_MAN_RIGHT;
-		case LEFT:
+		else if(move == MOVE.LEFT)
 			return JAVA_MESSAGE.PAC_MAN_LEFT;
-		}
 		
 		//nunca llegará aquí en teoría
 		return JAVA_MESSAGE.PAC_MAN_NEUTRAL;

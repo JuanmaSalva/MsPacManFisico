@@ -11,6 +11,12 @@ enum MESSAGE{
 
 	START,
 
+	LEFT,
+	NONE,
+	RIGHT,
+
+	TURN_ENDED,
+
 	RED_LED,
 	GREEN_LED,
 	BLUE_LED,

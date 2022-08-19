@@ -82,12 +82,18 @@ void CommunicationManager::WaitApproval(){
 void CommunicationManager::Update(){
 	//Comentado provisionalmente ya que de momento el recorrido está establecido por defecto en el DirectionController
 
-	// if(miBT.available()){
-	// 	MESSAGE msg = ReadMsg();
-	// 	if(msg == OK){
-	// 		return;
-	// 	}
-	// }
+	if(miBT.available()){
+		MESSAGE msg = ReadMsg();
+		if(msg == LEFT){
+			directionController->AddIntersection(left);
+		}
+		else if(msg == NONE){
+			directionController->AddIntersection(none);			
+		}
+		else if(msg == RIGHT){
+			directionController->AddIntersection(right);			
+		}
+	}
 }
 
 /**

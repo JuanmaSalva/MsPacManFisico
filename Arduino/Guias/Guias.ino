@@ -22,23 +22,28 @@ void setup() {
 	communicationManager->WaitApproval();
 
     directionController = new DirectionController();
+	directionController->SetCommunicationManager(communicationManager);
+	communicationManager->SetDirectionController(directionController);
 
     motorsController = new MotorsController();
     motorsController->Init();
     motorsController->SetLineTracker(lineTracker);
     motorsController->SetDirectionController(directionController);
+	motorsController->SetCommunicationManager(communicationManager);
 	communicationManager->SendMsg(MOTORS_INITIALIZED);
 	communicationManager->WaitApproval();
 
 	communicationManager->SendMsg(DIRECCTION_INITIALIZED);
 	communicationManager->WaitApproval();
 
-	communicationManager->SendMsg(MESSAGE::GREEN_LED);
+	communicationManager->WaitForMsg(MESSAGE::START);
+	motorsController->Start();
 }
 
 
 
 void loop() {
+	communicationManager->Update();
     lineTracker->Update();
     motorsController->Update();
 }

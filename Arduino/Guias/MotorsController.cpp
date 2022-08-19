@@ -2,6 +2,7 @@
 #include "LineTracker.h"
 #include "DirectionController.h"
 #include "TurningDirecction.h"
+#include "CommunicationManager.h"
 
 #define TURN_INTERSECCTION_MIN_TIME 250
 
@@ -29,6 +30,12 @@ void MotorsController::Init(){
 	currentState = STRAIGHT;
 }
 
+void MotorsController::Start(){
+	digitalWrite(forwardLeft, HIGH);
+	digitalWrite(backwardLeft, LOW);
+	digitalWrite(forwardRight, LOW);
+	digitalWrite(backwardRight, HIGH);
+}
 
 void MotorsController::Update(){
 
@@ -66,6 +73,7 @@ void MotorsController::Straight(){
 			analogWrite(rightSpeed, INCREASED_SPEED);
 			analogWrite(leftSpeed, REDUCED_SPEED);
 		}
+		
 
 		startIntersecctionTime = millis();
 		currentState = TURN;
@@ -85,6 +93,7 @@ void MotorsController::Turn(){
 
 		endIntersecctionTime = millis();
 		currentState = STRAIGHT;
+		communicationManager->SendMsg(MESSAGE::TURN_ENDED);
 	}
 }
 
@@ -94,4 +103,8 @@ void MotorsController::SetLineTracker(LineTracker* _lineTracker){
 
 void MotorsController::SetDirectionController(DirectionController* _directionController){
 	directionController = _directionController;
+}
+
+void MotorsController::SetCommunicationManager(CommunicationManager* _communicationManager){
+	communicationManager = _communicationManager;
 }
