@@ -84,7 +84,7 @@ public class main {
 	static void startExecution() {
         Executor executor = new Executor.Builder()
                 .setTickLimit(4000)
-                .setTimeLimit(60)
+                .setTimeLimit(200)
                 .setGhostPO(false)
                 .setPacmanPO(false)
                 .setPacmanPOvisual(false) 
