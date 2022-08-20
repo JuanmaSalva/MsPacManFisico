@@ -3,6 +3,7 @@
 #include <SoftwareSerial.h>
 
 class DirectionController;
+class MotorsController;
 
 enum MESSAGE{
 	SYNC_ATTEMP,
@@ -38,6 +39,7 @@ private:
 	bool start = false;
 
 	DirectionController* directionController;
+	MotorsController* motorsController;
 public:
 	CommunicationManager();
 
@@ -45,7 +47,8 @@ public:
 	void Sync();
 	void Update();
 
-	void SetDirectionController(DirectionController* d);
+	void SetDirectionController(DirectionController* d);	
+	void SetMotorsController(MotorsController* m);
 
 	void SendMsg(MESSAGE msg);
 	MESSAGE ReadMsg();

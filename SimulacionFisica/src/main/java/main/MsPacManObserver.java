@@ -9,14 +9,15 @@ import pacman.game.Constants.MOVE;
 import pacman.game.GameObserver;
 
 public class MsPacManObserver implements GameObserver{
-	private MOVE lastPacManMove = MOVE.NEUTRAL;
+	private MOVE lastPacManMove = MOVE.LEFT;
 	
 	
 	public void pacManMove(MOVE move, boolean inJunction) {
-		if(move != lastPacManMove || inJunction) {
+		if((move != lastPacManMove || inJunction) && move != MOVE.NEUTRAL) {
 			System.out.println(move);
-			CommunicationManager.MessageSender.SendMsg(fromMoveToJavaMessagePacMan(move));
 			lastPacManMove = move;
+			
+			CommunicationManager.MessageSender.SendMsg(fromMoveToJavaMessagePacMan(move));
 			
 			while(true) {
 				JAVA_MESSAGE msg = CommunicationManager.MessageSender.ReadMsg();

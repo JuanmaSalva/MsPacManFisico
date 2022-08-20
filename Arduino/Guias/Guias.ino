@@ -30,15 +30,17 @@ void setup() {
     motorsController->SetLineTracker(lineTracker);
     motorsController->SetDirectionController(directionController);
 	motorsController->SetCommunicationManager(communicationManager);
+
+	communicationManager->SetMotorsController(motorsController);
 	communicationManager->SendMsg(MOTORS_INITIALIZED);
 	communicationManager->WaitApproval();
-
 	communicationManager->SendMsg(DIRECCTION_INITIALIZED);
 	communicationManager->WaitApproval();
 
 	communicationManager->WaitForMsg(MESSAGE::START);
 	motorsController->Start();
 }
+
 
 
 

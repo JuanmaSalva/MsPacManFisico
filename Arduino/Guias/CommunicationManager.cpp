@@ -1,5 +1,6 @@
 #include "CommunicationManager.h"
 #include "DirectionController.h"
+#include "MotorsController.h"
 
 CommunicationManager::CommunicationManager(): miBT(3,5)
 {
@@ -86,12 +87,15 @@ void CommunicationManager::Update(){
 		MESSAGE msg = ReadMsg();
 		if(msg == LEFT){
 			directionController->AddIntersection(left);
+			motorsController->Walk();
 		}
 		else if(msg == NONE){
-			directionController->AddIntersection(none);			
+			directionController->AddIntersection(none);		
+			motorsController->Walk();	
 		}
 		else if(msg == RIGHT){
-			directionController->AddIntersection(right);			
+			directionController->AddIntersection(right);	
+			motorsController->Walk();		
 		}
 	}
 }
@@ -117,4 +121,8 @@ void CommunicationManager::WaitForMsg(MESSAGE msg){
 
 void CommunicationManager::SetDirectionController(DirectionController* d){
 	directionController = d;
+}
+
+void CommunicationManager::SetMotorsController(MotorsController* m){
+	motorsController = m;
 }

@@ -3,7 +3,7 @@
 #include "CommunicationManager.h"
 
 DirectionController::DirectionController(){
-    nextIntersecction = none;
+    nextIntersecction = right;
 }
 
 

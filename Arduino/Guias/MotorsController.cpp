@@ -88,13 +88,20 @@ void MotorsController::Turn(){
 
 	if(lineTracker->EndTurn())
 	{
-		analogWrite(rightSpeed, NORMAL_SPEED);
-		analogWrite(leftSpeed, NORMAL_SPEED);
+		analogWrite(rightSpeed, 0);
+		analogWrite(leftSpeed, 0);
 
 		endIntersecctionTime = millis();
 		currentState = STRAIGHT;
 		communicationManager->SendMsg(MESSAGE::TURN_ENDED);
 	}
+}
+
+
+
+void MotorsController::Walk(){
+	analogWrite(rightSpeed, NORMAL_SPEED);
+	analogWrite(leftSpeed, NORMAL_SPEED);
 }
 
 void MotorsController::SetLineTracker(LineTracker* _lineTracker){

@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include "States.h"
 
-#define NORMAL_SPEED 100.0
+#define NORMAL_SPEED 120.0
 #define REDUCED_SPEED 40.0
 #define INCREASED_SPEED 255.0
 
@@ -38,6 +38,8 @@ public:
 	void Init();
 	void Start();
 	void Update();
+
+	void Walk();
 
 
 	void SetLineTracker(LineTracker* _lineTracker);

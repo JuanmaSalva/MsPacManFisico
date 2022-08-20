@@ -110,7 +110,7 @@ void MsPacManEngineCommunication(){
 		}
 		
 
-		communicationManager->SendMsg(msgToSend);
+		communicationManager->SendMsg(LEFT);
 	}
 }
 
@@ -118,7 +118,7 @@ void MsPacManEngineCommunication(){
 /**
  * @brief Se lee y se procesan de los mensajes de debug recibidos desde el robot
  **/
-void DebugLed(){
+void ReadMsg(){
 	if(communicationManager->MsgAvailable()){
 		Serial.println("Mensaje Recibido");
 		MESSAGE msg = communicationManager->ReadMsg();
@@ -167,5 +167,5 @@ void DebugLed(){
 void loop() {
 	MsPacManEngineCommunication();
 
-	DebugLed();
+	ReadMsg();
 }

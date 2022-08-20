@@ -6,6 +6,7 @@ import com.fazecast.jSerialComm.SerialPort;
 
 import communication.CommunicationManager;
 import communication.JAVA_MESSAGE;
+import es.ucm.fdi.ici.c2021.practica3.grupo09.MsPacMan;
 import pacman.Executor;
 import pacman.controllers.GhostController;
 import pacman.controllers.GhostsRandom;
@@ -19,7 +20,6 @@ import pacman.game.internal.POType;
 public class main {	
 	
 	public static void main(String[] args) throws IOException, InterruptedException{		
-		
 		//Se inicializa el arduino
 		System.out.println("Vamos a inicializar el arduino");	
 		SerialPort sp = SerialPort.getCommPort("/dev/ttyACM0");
@@ -94,13 +94,13 @@ public class main {
                 .build();
 
         PacmanController pacMan = //new pacman.controllers.examples.PacManRandom();
-        						new HumanController(new KeyBoardInput());
+        						new MsPacMan();
         GhostController ghosts = new GhostsRandom();
         MsPacManObserver observer = new MsPacManObserver();
        
         
         System.out.println( 
-        		executor.runGame(pacMan, ghosts, 40, observer)
+        		executor.runGame(pacMan, ghosts, 100, observer)
         );
         System.out.println("CERRADO");    
 	}

@@ -655,8 +655,11 @@ public class Executor {
             MOVE pacManMove = pacManController.getMove(getPacmanCopy(game), System.currentTimeMillis() + timeLimit);
             
             //PacMan moves
-            observer.pacManMove(game.getPacmanLastMoveMade(), game.isJunction(game.getPacmanCurrentNodeIndex()));
             
+            if(pacManMove != MOVE.NEUTRAL)
+            	observer.pacManMove(pacManMove, game.isJunction(game.getPacmanCurrentNodeIndex()));
+            else
+            	observer.pacManMove(game.getPacmanLastMoveMade(), game.isJunction(game.getPacmanCurrentNodeIndex()));
             
             //Ghosts moves
             EnumMap<GHOST,MOVE> ghostsMove = new EnumMap<GHOST, MOVE>(GHOST.class);
